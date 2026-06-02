@@ -9,19 +9,14 @@
 
 class LijnVolgenToestand : public RobotToestand {
 private:
-    int positie     = 0;
-    int fout        = 0;
-    int vorigeFout  = 0;
-
-    void volgLijn();
-    void behandelKruising();
-    void behandelMarkeringen();
-    void LijnKwijt();
+    unsigned int sensorWaarden[5];
+    int vorigeFout = 0;
 
 public:
     LijnVolgenToestand(ZumoRobot& robot);
 
-    void enter()  override;
+    void enter() override;
     void update() override;
-    void exit()   override;
+    void exit() override;
 };
+

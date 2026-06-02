@@ -40,4 +40,6 @@ public:
   void loop();
   void setState(RobotToestand* staat);
   void update();
+  ZumoHardware& getHardware() { return hardware; }
+
 };
