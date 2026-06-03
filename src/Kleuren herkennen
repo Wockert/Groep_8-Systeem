@@ -1,0 +1,205 @@
+#include <Wire.h>
+#include <Zumo32U4.h>
+
+struct SensorData {
+  unsigned int lineRaw[5];   // Slaat de 5 ruwe lijnsensorwaarden op
+  unsigned int lineCalibrated[5];   // Slaat de 5 gekalibreerde lijnsensorwaarden op
+};
+
+class RobotConfig {
+public:
+  static const int AANTAL_METINGEN = 5;   // Aantal metingen per kleur
+  static const int AANTAL_SAMPLES = 5;   // Aantal snelle metingen voor een stabieler gemiddelde
+
+  static const int WIT_MAX = 50;
+
+  static const int GROEN_MIN = 120;
+  static const int GROEN_MAX = 200;
+
+  static const int GRIJS_MIN = 300;
+  static const int GRIJS_MAX = 365;
+
+  static const int ONZEKER_MIN = 366;
+  static const int ONZEKER_MAX = 374;
+
+  static const int BRUIN_MIN = 375;
+  static const int BRUIN_MAX = 430;
+
+  static const int ZWART_MIN = 700;
+  static const int ZWART_MAX = 1000;
+};
+
+class ZumoHardware {=
+private:
+  Zumo32U4LineSensors lineSensors;   // Maakt een object voor de 5 lijnsensoren
+
+public:
+  void setupHardware() {     // Functie om de hardware klaar te zetten
+    lineSensors.initFiveSensors();     // Zet de 5 lijnsensoren aan
+  }
+
+  void kalibreerLijnSensoren() {     // Functie om de lijnsensoren te kalibreren
+    Serial.println("Kalibratie start.");
+    Serial.println("Beweeg de Zumo 5 seconden rustig over wit en zwart.");
+
+    for (int i = 0; i < 250; i++) {     // Herhaalt de kalibratie 250 keer
+      lineSensors.calibrate();     // Laat de sensor wit en zwart leren, daarmee weet het de hoogste en laagste waarde, maakt het weten van verschillende kleuren beter
+      delay(20);
+    }
+
+    Serial.println("Kalibratie klaar.");
+    Serial.println();
+  }
+
+  SensorData leesSensorData() {     // Functie om de sensorwaarden te lezen
+    SensorData data;     // Maakt een variabele om de sensorwaarden in op te slaan
+
+    lineSensors.read(data.lineRaw);     // Leest de ruwe sensorwaarden
+    lineSensors.readCalibrated(data.lineCalibrated);     // Leest de gekalibreerde sensorwaarden
+
+    return data;     // Geeft de gemeten sensorwaarden terug
+  }
+
+  int leesSensorGemiddeld(int sensorIndex) {     // Leest één sensor meerdere keren en berekent het gemiddelde
+    int som = 0;     // Variabele om alle metingen bij elkaar op te tellen
+
+    for (int i = 0; i < RobotConfig::AANTAL_SAMPLES; i++) {     // Herhaalt de meting meerdere keren
+      SensorData data = leesSensorData();     // Leest alle sensorwaarden uit
+      som += data.lineCalibrated[sensorIndex];     // Telt de gekozen sensorwaarde op bij de som
+      delay(20);
+    }
+
+    return som / RobotConfig::AANTAL_SAMPLES;     // Geeft het gemiddelde terug
+  }
+};
+
+class LineSensorAnalyse {     // Klasse die bepaalt welke kleur wordt gezien
+public:
+  String bepaalKleur(int midden) {     // Functie die een kleur bepaalt met de middensensorwaarde
+    if (midden <= RobotConfig::WIT_MAX) {     // Controleert of de waarde bij wit hoort
+      return "wit";     // Geeft wit terug
+    }
+
+    else if (midden >= RobotConfig::GROEN_MIN && midden <= RobotConfig::GROEN_MAX) {     // Controleert of de waarde bij groen hoort
+      return "groen";     // Geeft groen terug
+    }
+
+    else if (midden >= RobotConfig::GRIJS_MIN && midden <= RobotConfig::GRIJS_MAX) {     // Controleert of de waarde bij grijs hoort
+      return "grijs";     // Geeft grijs terug
+    }
+
+    else if (midden >= RobotConfig::ONZEKER_MIN && midden <= RobotConfig::ONZEKER_MAX) {     // Controleert of de waarde in het onzekere gebied zit
+      return "onzeker";     // Geeft onzeker terug
+    }
+
+    else if (midden >= RobotConfig::BRUIN_MIN && midden <= RobotConfig::BRUIN_MAX) {     // Controleert of de waarde bij bruin hoort
+      return "bruin";     // Geeft bruin terug
+    }
+
+    else if (midden >= RobotConfig::ZWART_MIN && midden <= RobotConfig::ZWART_MAX) {     // Controleert of de waarde bij zwart hoort
+      return "zwart";     // Geeft zwart terug
+    }
+
+    else {     // Als de waarde bij geen enkele kleur past
+      return "onbekend";     // Geeft onbekend terug
+    }
+
+  }
+};
+
+ZumoHardware hardware;     // Maakt een object om de Zumo hardware te gebruiken
+LineSensorAnalyse analyse;     // Maakt een object om de sensorwaarden te analyseren
+
+const char* kleuren[] = {"wit", "zwart", "groen", "grijs", "bruin"};     // Lijst met kleuren die getest worden
+const int aantalKleuren = 5;     // Aantal kleuren in de lijst
+
+void wachtOpEnter() {     // Functie die wacht tot de gebruiker iets typt
+  while (Serial.available() == 0) {     // Blijft wachten zolang er niets is ingevoerd
+  }
+
+  while (Serial.available() > 0) {     // Zolang er nog tekst in de buffer staat
+    Serial.read();     // Leest de buffer leeg
+  }
+}
+
+void meetKleur(const char* kleurNaam) {     // Functie om één kleur te meten
+  Serial.println();
+  Serial.print("Leg de middensensor boven kleur: ");
+  Serial.println(kleurNaam);
+  Serial.println("Typ iets en druk op Enter om te meten.");
+  wachtOpEnter();     // Wacht tot de gebruiker op Enter drukt
+
+  Serial.println("kleur;meting;raw1;raw2;raw3;raw4;raw5;cal1;cal2;cal3;cal4;cal5;middensensor;rechtsensor;middensensorGemiddeld;rechtsensorGemiddeld;herkend"); // Print de waardes
+
+  for (int meting = 1; meting <= RobotConfig::AANTAL_METINGEN; meting++) {     // Herhaalt de meting 5 keer
+    SensorData data = hardware.leesSensorData();     // Leest alle sensorwaarden
+
+    int middenSensor = data.lineCalibrated[2];     // Slaat de waarde van de middensensor op
+    int rechterSensor = data.lineCalibrated[3];     // Slaat de waarde van de rechter sensor naast het midden op
+
+    int middenGemiddeld = hardware.leesSensorGemiddeld(2);     // Berekent gemiddelde van de middensensor
+    int rechtsGemiddeld = hardware.leesSensorGemiddeld(3);     // Berekent gemiddelde van de rechter sensor
+
+    String herkend = analyse.bepaalKleur(middenGemiddeld);     // Bepaalt de kleur op basis van het gemiddelde van de middensensor
+
+    Serial.print(kleurNaam);     // Print de echte kleur die getest wordt
+    Serial.print(";");     // Print scheidingsteken
+
+    Serial.print(meting);     // Print het meetnummer
+    Serial.print(";");     // Print scheidingsteken
+
+    for (int i = 0; i < 5; i++) {     // Loopt door de 5 ruwe sensorwaarden
+      Serial.print(data.lineRaw[i]);     // Print één ruwe sensorwaarde
+      Serial.print(";");     // Print scheidingsteken
+    }
+
+    for (int i = 0; i < 5; i++) {     // Loopt door de 5 gekalibreerde sensorwaarden
+      Serial.print(data.lineCalibrated[i]);     // Print één gekalibreerde sensorwaarde
+      Serial.print(";");     // Print scheidingsteken
+    }
+
+    Serial.print(middenSensor);     // Print de losse middensensorwaarde
+    Serial.print(";");     // Print scheidingsteken
+
+    Serial.print(rechterSensor);     // Print de losse rechter sensorwaarde
+    Serial.print(";");     // Print scheidingsteken
+
+    Serial.print(middenGemiddeld);     // Print het gemiddelde van de middensensor
+    Serial.print(";");     // Print scheidingsteken
+
+    Serial.print(rechtsGemiddeld);     // Print het gemiddelde van de rechter sensor
+    Serial.print(";");     // Print scheidingsteken
+
+    Serial.println(herkend);     // Print de herkende kleur en gaat naar nieuwe regel
+
+    delay(200);
+  }
+
+  Serial.println("Kleur klaar.");
+}
+
+void setup() {     // Setup draait één keer bij het opstarten
+  Serial.begin(9600);     // Start de Serial Monitor met baudrate 9600
+  delay(2000);     // Wacht 2 seconden zodat Serial Monitor kan opstarten
+
+  Serial.println("Lijnsensor kleurentest gestart.");
+
+  hardware.setupHardware();     // Zet de lijnsensoren klaar
+
+  Serial.println("Typ iets en druk op Enter om te kalibreren.");     // Vraagt om start van kalibratie
+  wachtOpEnter();     // Wacht op Enter
+
+  hardware.kalibreerLijnSensoren();     // Kalibreert de lijnsensoren
+}
+
+void loop() {     // Loop draait normaal steeds opnieuw
+  for (int i = 0; i < aantalKleuren; i++) {     // Loopt door alle kleuren in de lijst
+    meetKleur(kleuren[i]);     // Meet de huidige kleur
+  }
+
+  Serial.println();
+  Serial.println("Alle kleuren zijn gemeten.");     // Print dat alles klaar is
+
+  while (true) {     // Oneindige lus om het programma te stoppen
+  }
+}
