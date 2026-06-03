@@ -10,10 +10,10 @@
 class RobotConfig {
 public:
   // --- Snelheden ---
-  static constexpr int SNELHEID_MAX      = 0;
-  static constexpr int SNELHEID_NORMAAL  = 0;
-  static constexpr int SNELHEID_GROEN    = 0;
-  static constexpr int SNELHEID_WIP      = 0;
+  static constexpr int SNELHEID_MAX      = 400;
+  static constexpr int SNELHEID_NORMAAL  = 200;
+  static constexpr int SNELHEID_GROEN    = 200;
+  static constexpr int SNELHEID_WIP      = 350;
   static constexpr int SNELHEID_ZOEKEN   = 0;
 
   // --- Kleurdrempels ---
