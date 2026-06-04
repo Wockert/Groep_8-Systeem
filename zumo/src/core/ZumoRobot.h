@@ -35,9 +35,16 @@ private:
   BlokZoeker       blokZoeker;
   SensorData       sensorData;
 
+  // Print de huidige snapshot naar de seriële monitor (debug/controle).
+  void printSensorData();
+
 public:
   void setup();
   void loop();
   void setState(RobotToestand* staat);
   void update();
+
+  // Geeft de snapshot van deze ronde terug. Toestanden lezen hieruit
+  // (via hun robot-referentie) zodat iedereen dezelfde meting gebruikt.
+  const SensorData& getSensorData() const;
 };

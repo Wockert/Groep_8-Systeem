@@ -8,6 +8,7 @@
 
 #include <Arduino.h>
 #include <Zumo32U4.h>
+#include "../config/SensorData.h"
 
 class ZumoHardware {
 private:
@@ -17,6 +18,7 @@ private:
   Zumo32U4IMU              imu;
   Zumo32U4ProximitySensors prox;
   Zumo32U4Encoders         encoders;
+  Zumo32U4ButtonA          knopA;
 
 public:
   void init();
@@ -26,4 +28,9 @@ public:
   void stopMotors();
   void print(String text);
   void playDoneSound();
+
+  // Leest alle sensoren in EEN keer uit en geeft een SensorData-momentopname
+  // terug. ZumoRobot roept dit aan bovenaan elke ronde, zodat elke klasse in
+  // die ronde exact dezelfde meting ziet (zie SensorData <<snapshot>>).
+  SensorData leesSnapshot();
 };

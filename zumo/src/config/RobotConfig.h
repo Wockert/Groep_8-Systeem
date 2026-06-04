@@ -28,7 +28,9 @@ public:
   // --- Timing & afstand ---
   static constexpr int   GEHEUGEN_MS     = 0;
   static constexpr int   DOORRIJDEN_CM   = 0;
-  static constexpr float CM_PER_PULSE    = 0.0f;
+  // Door het team gemeten en getest: 0.019 cm per encodertick/pulse.
+  // (afstand = gemiddelde van links+rechts ticks * deze waarde)
+  static constexpr float CM_PER_PULSE    = 0.019f;
 
   // --- PD-regeling ---
   static constexpr float KP = 0.0f;

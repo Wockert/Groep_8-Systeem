@@ -1,0 +1,3 @@
+# Door de VS Code/Arduino-debugger gegenereerd en machine-specifiek
+# (bevat absolute paden) — niet delen.
+.vscode/tasks.json
