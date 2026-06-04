@@ -11,8 +11,8 @@ class RobotConfig {
 public:
   // --- Snelheden ---
 static constexpr int SNELHEID_MAX      = 400;
-static constexpr int SNELHEID_NORMAAL  = 250;
-static constexpr int SNELHEID_GROEN    = 200;
+static constexpr int SNELHEID_NORMAAL  = 300;   // basissnelheid op zwart
+static constexpr int SNELHEID_GROEN    = 200;   // halve snelheid op groen
 static constexpr int SNELHEID_WIP      = 180;
 static constexpr int SNELHEID_ZOEKEN   = 150;
 
