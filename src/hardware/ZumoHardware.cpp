@@ -1,37 +1,77 @@
 #include "ZumoHardware.h"
+#include <Wire.h>
+
+void ZumoHardware::init() {
+  Wire.begin();
+
+  sensors.initFiveSensors();
+  prox.initFrontSensor();
+
+  for (uint16_t i = 0; i < 120; i++) {
+    if (i > 30 && i <= 90) {
+      motors.setSpeeds(-200, 200);
+    } else {
+      motors.setSpeeds(200, -200);
+    }
+
+    sensors.calibrate();
+  }
+
+  motors.setSpeeds(0, 0);
+}
+
+int ZumoHardware::readLine(unsigned int sensorWaarden[]) {
+  return sensors.readLine(sensorWaarden);
+}
 
 void ZumoHardware::readCalibrated(unsigned int sensorWaarden[]) {
-}
-int ZumoHardware::readLine(unsigned int values[]) {
-    return sensors.readLine(values);
+  sensors.readCalibrated(sensorWaarden);
 }
 
-void ZumoHardware::setMotorSpeeds(int l, int r) {
-    motors.setSpeeds(l, r);
+void ZumoHardware::readRawLine(unsigned int sensorWaarden[]) {
+  sensors.read(sensorWaarden);
+}
+
+void ZumoHardware::printRawLineSensors() {
+  unsigned int waarden[5];
+
+  readRawLine(waarden);
+
+  Serial.print("RAW: ");
+  for (int i = 0; i < 5; i++) {
+    Serial.print(waarden[i]);
+    Serial.print("\t");
+  }
+  Serial.println();
+}
+
+void ZumoHardware::readProximity() {
+  prox.read();
+}
+
+uint8_t ZumoHardware::getProxLeft() {
+  return prox.countsFrontWithLeftLeds();
+}
+
+uint8_t ZumoHardware::getProxRight() {
+  return prox.countsFrontWithRightLeds();
+}
+
+void ZumoHardware::setMotorSpeeds(int left, int right) {
+  motors.setSpeeds(left, right);
 }
 
 void ZumoHardware::stopMotors() {
-    motors.setSpeeds(0, 0);
-}
-
-void ZumoHardware::init() {
-    sensors.initFiveSensors();
-
-    // Kalibreren terwijl de robot op zijn plek heen en weer draait,
-    // zodat de sensoren vanzelf over zwart EN wit vegen.
-    // Zet hem met de sensoren boven de lijn neer voordat hij aangaat.
-    for (uint16_t i = 0; i < 120; i++) {
-        if (i > 30 && i <= 90)
-            motors.setSpeeds(-200, 200);   // naar de ene kant draaien
-        else
-            motors.setSpeeds(200, -200);   // naar de andere kant terug
-        sensors.calibrate();
-    }
-    motors.setSpeeds(0, 0);                 // weer stilstaan na kalibratie
+  motors.setSpeeds(0, 0);
 }
 
 void ZumoHardware::print(String text) {
+  Serial.println(text);
+
+  lcd.clear();
+  lcd.print(text);
 }
 
 void ZumoHardware::playDoneSound() {
+  buzzer.play("l16 cdegreg4");
 }
