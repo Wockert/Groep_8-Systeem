@@ -1,77 +1,35 @@
-#include "ZumoHardware.h"
-#include <Wire.h>
+// =============================================================
+//  ZumoHardware  <<facade>>
+//  Facade voor alle hardware: motoren, sensoren, LCD en IMU.
+//  De rest van de code praat alleen met deze klasse, niet direct
+//  met de Zumo32U4-bibliotheek.
+// =============================================================
+#pragma once
 
-void ZumoHardware::init() {
-  Wire.begin();
+#include <Arduino.h>
+#include <Zumo32U4.h>
 
-  sensors.initFiveSensors();
-  prox.initFrontSensor();
+class ZumoHardware {
+private:
+  Zumo32U4LineSensors      sensors;
+  Zumo32U4Motors           motors;
+  Zumo32U4LCD              lcd;
+  Zumo32U4IMU              imu;
+  Zumo32U4ProximitySensors prox;
+  Zumo32U4Encoders         encoders;
+  Zumo32U4Buzzer           buzzer;
 
-  for (uint16_t i = 0; i < 120; i++) {
-    if (i > 30 && i <= 90) {
-      motors.setSpeeds(-200, 200);
-    } else {
-      motors.setSpeeds(200, -200);
-    }
-
-    sensors.calibrate();
-  }
-
-  motors.setSpeeds(0, 0);
-}
-
-int ZumoHardware::readLine(unsigned int sensorWaarden[]) {
-  return sensors.readLine(sensorWaarden);
-}
-
-void ZumoHardware::readCalibrated(unsigned int sensorWaarden[]) {
-  sensors.readCalibrated(sensorWaarden);
-}
-
-void ZumoHardware::readRawLine(unsigned int sensorWaarden[]) {
-  sensors.read(sensorWaarden);
-}
-
-void ZumoHardware::printRawLineSensors() {
-  unsigned int waarden[5];
-
-  readRawLine(waarden);
-
-  Serial.print("RAW: ");
-  for (int i = 0; i < 5; i++) {
-    Serial.print(waarden[i]);
-    Serial.print("\t");
-  }
-  Serial.println();
-}
-
-void ZumoHardware::readProximity() {
-  prox.read();
-}
-
-uint8_t ZumoHardware::getProxLeft() {
-  return prox.countsFrontWithLeftLeds();
-}
-
-uint8_t ZumoHardware::getProxRight() {
-  return prox.countsFrontWithRightLeds();
-}
-
-void ZumoHardware::setMotorSpeeds(int left, int right) {
-  motors.setSpeeds(left, right);
-}
-
-void ZumoHardware::stopMotors() {
-  motors.setSpeeds(0, 0);
-}
-
-void ZumoHardware::print(String text) {
-  Serial.println(text);
-
-  lcd.clear();
-  lcd.print(text);
-}
-
-void ZumoHardware::playDoneSound() {
-  buzzer.play("l16 cdegreg4");
-}
+public:
+  void init();
+  int  readLine(unsigned int sensorWaarden[]);
+  void readCalibrated(unsigned int sensorWaarden[]);
+  void readRawLine(unsigned int sensorWaarden[]);
+  void printRawLineSensors();
+  void readProximity();
+  uint8_t getProxLeft();
+  uint8_t getProxRight();
+  void setMotorSpeeds(int left, int right);
+  void stopMotors();
+  void print(String text);
+  void playDoneSound();
+};
