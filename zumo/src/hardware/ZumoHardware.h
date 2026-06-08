@@ -19,9 +19,11 @@ private:
   Zumo32U4ProximitySensors prox;
   Zumo32U4Encoders         encoders;
   Zumo32U4ButtonA          knopA;
+  Zumo32U4ButtonB          knopB;
 
 public:
   void init();
+  void kalibreerLijn();   // draait kort rond en leert wit/zwart (nodig voor readLine)
   int  readLine(unsigned int sensorWaarden[]);
   void readCalibrated(unsigned int sensorWaarden[]);
   void setMotorSpeeds(int left, int right);

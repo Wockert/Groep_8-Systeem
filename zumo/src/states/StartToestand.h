@@ -9,6 +9,9 @@
 #include "../core/RobotToestand.h"
 
 class StartToestand : public RobotToestand {
+private:
+  bool vorigeB = false;   // edge-detectie knop B (grijs ijken)
+
 public:
   StartToestand(ZumoRobot& robot);
   void enter()  override;

@@ -47,4 +47,9 @@ public:
   // Geeft de snapshot van deze ronde terug. Toestanden lezen hieruit
   // (via hun robot-referentie) zodat iedereen dezelfde meting gebruikt.
   const SensorData& getSensorData() const;
+
+  // Toegang voor de toestanden tot de serviceklassen.
+  ZumoHardware&      getHardware()     { return hardware; }
+  RijController&     getRijController() { return rijController; }
+  LineSensorAnalyse& getLijnAnalyse()  { return lijnAnalyse; }
 };

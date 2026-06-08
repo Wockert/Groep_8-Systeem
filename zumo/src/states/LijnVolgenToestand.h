@@ -1,7 +1,8 @@
 // =============================================================
 //  LijnVolgenToestand
-//  De hoofdtoestand: volgt de lijn met PD-sturing en behandelt
-//  kruisingen en markeringen onderweg.
+//  Volgt puur de zwarte lijn met PD-sturing. Zodra hij een grijze
+//  markering ziet, draagt hij over aan KruispuntToestand, die de
+//  richting onthoudt en de afslag afhandelt.
 // =============================================================
 #pragma once
 
@@ -13,9 +14,6 @@ private:
   int fout    = 0;
 
   void volgLijn();
-  void behandelKruising();
-  void behandelMarkeringen();
-  void LijnKwijt();
 
 public:
   LijnVolgenToestand(ZumoRobot& robot);
