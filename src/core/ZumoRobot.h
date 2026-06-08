@@ -14,7 +14,7 @@
 #include "../control/RijController.h"
 #include "../control/BlokZoeker.h"
 
-class RobotToestand;   // forward declaration (alleen pointer nodig)
+class RobotToestand;
 
 class ZumoRobot {
 private:
@@ -27,19 +27,37 @@ private:
   bool           grijsRechtsGezien = false;
   int            huidigeSnelheid   = 0;
 
-  // --- 1:1 associaties uit het UML (door ZumoRobot gecoordineerd) ---
-  ZumoHardware     hardware;
+  // --- 1:1 associaties uit het UML ---
+  ZumoHardware      hardware;
   LineSensorAnalyse lijnAnalyse;
-  PitchDetector    pitchDetector;
-  RijController    rijController;
-  BlokZoeker       blokZoeker;
-  SensorData       sensorData;
+  PitchDetector     pitchDetector;
+  RijController     rijController;
+  BlokZoeker        blokZoeker;
+  SensorData        sensorData;
 
 public:
   void setup();
   void loop();
   void setState(RobotToestand* staat);
   void update();
-  ZumoHardware& getHardware() { return hardware; }
 
+  ZumoHardware& getHardware() {
+    return hardware;
+  }
+
+  LineSensorAnalyse& getLijnAnalyse() {
+    return lijnAnalyse;
+  }
+
+  RijController& getRijController() {
+    return rijController;
+  }
+
+  BlokZoeker& getBlokZoeker() {
+    return blokZoeker;
+  }
+
+  SensorData& getSensorData() {
+    return sensorData;
+  }
 };
