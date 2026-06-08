@@ -17,11 +17,17 @@ private:
   Zumo32U4IMU              imu;
   Zumo32U4ProximitySensors prox;
   Zumo32U4Encoders         encoders;
+  Zumo32U4Buzzer           buzzer;
 
 public:
   void init();
   int  readLine(unsigned int sensorWaarden[]);
   void readCalibrated(unsigned int sensorWaarden[]);
+  void readRawLine(unsigned int sensorWaarden[]);
+  void printRawLineSensors();
+  void readProximity();
+  uint8_t getProxLeft();
+  uint8_t getProxRight();
   void setMotorSpeeds(int left, int right);
   void stopMotors();
   void print(String text);
