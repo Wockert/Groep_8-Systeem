@@ -43,8 +43,6 @@ bool BlokZoeker::zoekEnDuwBlok(ZumoHardware& hardware) {
 
       negeerZwarteRandTot =
         millis() + BlokZoekConfig::MIN_AANVAL_TIJD_VOOR_RAND_MS;
-
-      Serial.println("Blok gezien. Aanvalmodus gestart.");
     }
 
     laatsteBlokGezienTijd = millis();
@@ -248,8 +246,6 @@ void BlokZoeker::keerOmBijRand(ZumoHardware& hardware) {
 }
 
 void BlokZoeker::stopNaUitduwen(ZumoHardware& hardware) {
-  Serial.println("Zwarte rand gezien. Nog kort doorduwen en stoppen.");
-
   hardware.setMotorSpeeds(
     BlokZoekConfig::SNELHEID_DUWEN,
     BlokZoekConfig::SNELHEID_DUWEN
