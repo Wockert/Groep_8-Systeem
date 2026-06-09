@@ -11,7 +11,7 @@ class RobotConfig {
 public:
   // --- Snelheden ---
 static constexpr int SNELHEID_MAX      = 400;
-static constexpr int SNELHEID_NORMAAL  = 250;   // basissnelheid op zwart
+static constexpr int SNELHEID_NORMAAL  = 300;   // basissnelheid op zwart
 static constexpr int SNELHEID_GROEN    = 200;   // halve snelheid op groen
 static constexpr int SNELHEID_WIP      = 180;
 static constexpr int SNELHEID_ZOEKEN   = 150;
@@ -34,5 +34,9 @@ static constexpr int DREMPEL_BRUIN_H   = 900;
 // --- PD-regeling ---
 static constexpr float KP = 0.4f;
 static constexpr float KD = 2.0f;
+
+// --- Toestand-overgang (debounce, aantal rondes achter elkaar) ---
+static constexpr int GROEN_BEVESTIG = 3;   // x rondes groen zien voor overgang naar groen
+static constexpr int ZWART_BEVESTIG = 3;   // x rondes niet-groen voor terug naar zwart
 
 };

@@ -43,5 +43,4 @@ public:
   ZumoHardware& getHardware() { return hardware; }
   LineSensorAnalyse& getLijnAnalyse() { return lijnAnalyse; }
 
-
 };

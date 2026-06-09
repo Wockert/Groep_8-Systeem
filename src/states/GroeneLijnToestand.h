@@ -11,7 +11,7 @@ class GroeneLijnToestand : public RobotToestand {
 private:
   unsigned int sensorWaarden[5] = {0};
   int          vorigeFout       = 0;
-  int          zwartTeller      = 0;   
+  int          zwartTeller      = 0;   // hoeveel rondes achter elkaar niet-groen (debounce)
 
 public:
   GroeneLijnToestand(ZumoRobot& robot);

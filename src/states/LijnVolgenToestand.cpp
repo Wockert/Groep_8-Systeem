@@ -46,7 +46,9 @@ void LijnVolgenToestand::update() {
         return;
     }
 
-
+    // --- TIJDELIJK METEN: wat geeft de donkerste sensor terug? ---
+    // Rijd over zwart, groen en wit en lees "max =" af in de Seriele Monitor.
+    // (Elke 10e ronde, zodat de Serial-print het rijden niet te veel afremt.)
     if (++printTeller >= 10) {
         printTeller = 0;
         Serial.print("max = ");
