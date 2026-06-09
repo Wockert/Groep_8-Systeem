@@ -13,11 +13,9 @@ class ZumoHardware {
 private:
   Zumo32U4LineSensors      sensors;
   Zumo32U4Motors           motors;
-  Zumo32U4LCD              lcd;
   Zumo32U4IMU              imu;
   Zumo32U4ProximitySensors prox;
   Zumo32U4Encoders         encoders;
-  Zumo32U4Buzzer           buzzer;
 
 public:
   void init();
@@ -31,5 +29,4 @@ public:
   void setMotorSpeeds(int left, int right);
   void stopMotors();
   void print(String text);
-  void playDoneSound();
 };
