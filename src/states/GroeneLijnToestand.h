@@ -9,7 +9,9 @@
 
 class GroeneLijnToestand : public RobotToestand {
 private:
-  int snelheid = 0;
+  unsigned int sensorWaarden[5] = {0};
+  int          vorigeFout       = 0;
+  int          zwartTeller      = 0;   
 
 public:
   GroeneLijnToestand(ZumoRobot& robot);
