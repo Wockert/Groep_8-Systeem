@@ -41,5 +41,7 @@ public:
   void setState(RobotToestand* staat);
   void update();
   ZumoHardware& getHardware() { return hardware; }
+  LineSensorAnalyse& getLijnAnalyse() { return lijnAnalyse; }
+
 
 };
