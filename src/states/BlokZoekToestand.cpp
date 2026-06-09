@@ -5,8 +5,6 @@ BlokZoekToestand::BlokZoekToestand(ZumoRobot& robot)
 : RobotToestand(robot) {}
 
 void BlokZoekToestand::enter() {
-  Serial.println("ENTER: BlokZoekToestand");
-
   robot.getHardware().stopMotors();
   robot.getBlokZoeker().resetAanval();
 }
