@@ -32,19 +32,6 @@ void ZumoHardware::readRawLine(unsigned int sensorWaarden[]) {
   sensors.read(sensorWaarden);
 }
 
-void ZumoHardware::printRawLineSensors() {
-  unsigned int waarden[5];
-
-  readRawLine(waarden);
-
-  Serial.print("RAW: ");
-  for (int i = 0; i < 5; i++) {
-    Serial.print(waarden[i]);
-    Serial.print("\t");
-  }
-  Serial.println();
-}
-
 void ZumoHardware::readProximity() {
   prox.read();
 }
@@ -65,13 +52,8 @@ void ZumoHardware::stopMotors() {
   motors.setSpeeds(0, 0);
 }
 
-void ZumoHardware::print(String text) {
-  Serial.println(text);
-
-  lcd.clear();
-  lcd.print(text);
+void ZumoHardware::printRawLineSensors() {
 }
 
-void ZumoHardware::playDoneSound() {
-  buzzer.play("l16 cdegreg4");
+void ZumoHardware::print(String text) {
 }
