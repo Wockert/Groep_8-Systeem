@@ -1,13 +1,14 @@
 #include "GroeneLijnToestand.h"
 #include "../core/ZumoRobot.h"
 #include "../config/RobotConfig.h"
+#include "../config/Debug.h"
 #include "LijnVolgenToestand.h"
 #include "StartToestand.h"
 
 GroeneLijnToestand::GroeneLijnToestand(ZumoRobot& robot) : RobotToestand(robot) {}
 
 void GroeneLijnToestand::enter() {
-  Serial.println(F("[GROEN] enter: groene lijn volgen"));
+  DBG.println(F("[GROEN] enter: groene lijn volgen"));
   robot.getHardware().print("Groene lijn");
   vorigeFout  = 0;
   dGefilterd  = 0;
@@ -32,7 +33,7 @@ void GroeneLijnToestand::update() {
   // zodat een enkele afwijkende meting (naad, vlekje) hem niet laat flippen.
   if (!robot.getLijnAnalyse().isGroeneLijn()) {
     if (++zwartTeller >= RobotConfig::GROEN_BEVESTIG) {
-      Serial.println(F("[GROEN] exit: geen groen meer -> zwarte lijnvolger"));
+      DBG.println(F("[GROEN] exit: geen groen meer -> zwarte lijnvolger"));
       robot.getBaanPlan().rondAf(s.distanceCm);   // groen-checkpoint afgerond
       robot.setState(new LijnVolgenToestand(robot));
       return;   // oude toestand is hierna verwijderd

@@ -24,6 +24,8 @@ private:
   bool bezigMetAfslaan = false;    // bezig de tak op te sturen?
   int  afslagRichting  = 0;        // -1 = links, +1 = rechts
   unsigned long afslagTijd = 0;    // start van de afslag
+  long afslagTicksL = 0;           // encoderstand bij start afslag (draaihoek-meting:
+  long afslagTicksR = 0;           // afslag pas klaar na een minimale gedraaide hoek)
   bool aLosgelaten = false;        // A moet eerst los voordat hij als stopknop telt
 
   void volgLijn();

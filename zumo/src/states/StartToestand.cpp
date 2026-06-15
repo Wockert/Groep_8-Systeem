@@ -27,11 +27,22 @@ void StartToestand::update() {
   if (!s.buttonB) {
     bLosgelaten = true;
   } else if (bLosgelaten) {
-    // Zonder lijnkalibratie zijn de gekalibreerde waarden onzin: eerst A.
+    // Zonder lijnkalibratie zijn de gekalibreerde waarden onzin. De volgorde
+    // mag de gebruiker echter niet hoeven kennen: druk je B als eerste, dan
+    // kalibreren we hier alsnog automatisch (dezelfde heen-en-weer-veeg als
+    // knop A). Daarna moet de robot wél stil op grijs staan, dus vragen we om
+    // 'm neer te zetten en B nóg een keer te drukken voor de echte meting.
     if (!lijnGekalibreerd) {
-      robot.getHardware().print("Eerst A (kalib)");
-      Serial.println(F("[GRIJS IJKEN] eerst kalibreren (knop A) voordat je grijs ijkt"));
-      bLosgelaten = false;
+      robot.getHardware().print("Kalibreren...");
+      if (robot.getHardware().kalibreerLijn()) {   // robot moet OP de lijn staan
+        lijnGekalibreerd = true;
+        robot.getHardware().print("OK! grijs+B");
+        Serial.println(F("[GRIJS IJKEN] gekalibreerd; zet sensor op grijs en druk B"));
+      } else {
+        robot.getHardware().print("Kalib FOUT! B=retry");
+        Serial.println(F("[GRIJS IJKEN] kalibratie mislukt (te weinig contrast)"));
+      }
+      bLosgelaten = false;   // echte meting vereist een NIEUWE druk op B
       return;
     }
     int hoog = s.lineValues[0], laag = s.lineValues[0];

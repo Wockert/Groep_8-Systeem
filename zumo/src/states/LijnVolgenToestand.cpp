@@ -1,6 +1,7 @@
 #include "LijnVolgenToestand.h"
 #include "../core/ZumoRobot.h"
 #include "../config/RobotConfig.h"
+#include "../config/Debug.h"
 #include "StartToestand.h"
 #include "KruispuntToestand.h"
 #include "GroeneLijnToestand.h"
@@ -9,11 +10,19 @@ LijnVolgenToestand::LijnVolgenToestand(ZumoRobot& robot) : RobotToestand(robot) 
 
 void LijnVolgenToestand::enter() {
   robot.getHardware().print("Lijn volgen");
+
+  // Grijs niet geijkt (knop B)? Dan valt isGrijs() terug op de VASTE drempels
+  // (DREMPEL_GRIJS_L/H), die per baan/licht verschillen — een veelvoorkomende
+  // reden dat het kruispunt niet pakt. Eenmalig waarschuwen zodat je het ziet.
+  if (RobotConfig::GRIJS_ACTIEF && robot.getLijnAnalyse().getGrijsNiveau() == 0) {
+    DBG.println(F("[LET OP] grijs NIET geijkt (knop B) -> vaste drempels; kruispunt kan missen"));
+  }
   vorigeFout  = 0;
   dGefilterd  = 0;
   foutSom     = 0;
   basis       = RobotConfig::SNELHEID_LAAG;   // rustig wegrijden, ramp daarna op
   aLosgelaten = false;   // de startdruk op A telt niet meteen als stop
+  cLosgelaten = false;   // C moet eerst los voordat een druk een checkpoint overslaat
   inBocht     = false;
   bochtKant   = 0;
   randTeller  = 0;
@@ -31,6 +40,19 @@ void LijnVolgenToestand::update() {
   } else if (aLosgelaten) {
     robot.setState(new StartToestand(robot));
     return;   // oude toestand is hierna verwijderd
+  }
+
+  // --- Knop C = huidige checkpoint overslaan (handmatig +1) ---
+  // Handig als de robot ergens blijft hangen op een checkpoint dat niet pakt:
+  // een druk op C rondt het verwachte checkpoint af en gaat naar het volgende
+  // (de piep uit rondAf() bevestigt het). C moet eerst losgelaten zijn, zodat
+  // een ingehouden druk niet meerdere checkpoints achter elkaar wegtikt.
+  if (!s.buttonC) {
+    cLosgelaten = true;
+  } else if (cLosgelaten) {
+    robot.getBaanPlan().rondAf(s.distanceCm);
+    DBG.println(F("[KNOP C] checkpoint handmatig overgeslagen"));
+    cLosgelaten = false;   // volgende skip vereist een NIEUWE druk
   }
 
   // EEN meting per ronde: alles komt uit de snapshot (gekalibreerd:
@@ -71,8 +93,26 @@ void LijnVolgenToestand::update() {
   // Dat haalt de valse grijs-detecties (bochtranden!) er structureel uit.
   bool kruispuntVerwacht = robot.getBaanPlan().isVerwacht(CP_KRUISPUNT, s.distanceCm);
   LineSensorAnalyse& lijn = robot.getLijnAnalyse();
-  bool grijsL = RobotConfig::GRIJS_ACTIEF && kruispuntVerwacht && lijn.grijsTapeLinks();
-  bool grijsR = RobotConfig::GRIJS_ACTIEF && kruispuntVerwacht && lijn.grijsTapeRechts();
+
+  // --- DEBUG grijs-detectie ---
+  // RAUWE detectie (los van baanplan-gating), zodat je puur ziet of de sensor
+  // grijs herkent. Print alleen op de OVERGANG (niet elke ronde) om de Serial
+  // niet te spammen.
+  bool rauwGrijsL = lijn.grijsTapeLinks();
+  bool rauwGrijsR = lijn.grijsTapeRechts();
+  if ((rauwGrijsL || rauwGrijsR) && !grijsVorigeRonde) {
+    DBG.print(F("[GRIJS ZIEN] kant="));
+    DBG.print(rauwGrijsL ? F("LINKS") : F("RECHTS"));
+    DBG.print(F("  s0="));  DBG.print(sensorWaarden[0]);
+    DBG.print(F(" s4="));   DBG.print(sensorWaarden[4]);
+    DBG.print(F(" pos="));  DBG.print(positie);
+    DBG.print(F(" kruispuntVerwacht=")); DBG.print(kruispuntVerwacht);
+    DBG.print(F(" cm="));   DBG.println(s.distanceCm);
+  }
+  grijsVorigeRonde = (rauwGrijsL || rauwGrijsR);
+
+  bool grijsL = RobotConfig::GRIJS_ACTIEF && kruispuntVerwacht && rauwGrijsL;
+  bool grijsR = RobotConfig::GRIJS_ACTIEF && kruispuntVerwacht && rauwGrijsR;
   bool lijnRecht = (maxWaarde >= DREMPEL_LIJN)
                 && (abs(positie - 2000) < RobotConfig::GRIJS_LIJN_MIDDEN);
   if (!inBocht && lijnRecht && (grijsL || grijsR)) {
@@ -160,9 +200,16 @@ void LijnVolgenToestand::update() {
   // De robot blijft gewoon sturen en remt alvast af; de echte pivot start
   // pas zodra de lijn ECHT wegdraait (fout slaat uit, verderop) of
   // verdwijnt (lijn-kwijt-blok).
+  // In een stippellijn-stuk komen GEEN 90-graden-bochten voor, maar elke
+  // streepjes-rand raakt wel een buitensensor en zou anders als bocht worden
+  // aangekondigd. Dan schiet hij bij het volgende gat in een pivot (naar
+  // rechts/links) i.p.v. rechtdoor over te steken. Daarom: zolang stippellijn
+  // de beurt heeft (of we in de zone zitten) GEEN bocht aankondigen.
+  bool stippelContext = inStippelZone ||
+                        robot.getBaanPlan().isVerwacht(CP_STIPPELLIJN, s.distanceCm);
   bool randLinksZwart  = sensorWaarden[0] > (unsigned int)RobotConfig::BOCHT_RAND_ZWART;
   bool randRechtsZwart = sensorWaarden[4] > (unsigned int)RobotConfig::BOCHT_RAND_ZWART;
-  if (!naBocht && (randLinksZwart != randRechtsZwart)) {
+  if (!naBocht && !stippelContext && (randLinksZwart != randRechtsZwart)) {
     int kant = randLinksZwart ? -1 : +1;
     randTeller = (kant == randZwartKant) ? randTeller + 1 : 1;
     randZwartKant = kant;
@@ -176,6 +223,9 @@ void LijnVolgenToestand::update() {
   } else {
     randTeller = 0;
   }
+  // In stippel-context elke nog openstaande aankondiging wissen, zodat een
+  // rand die net VOOR de zone gezien werd geen pivot meer kan starten.
+  if (stippelContext) randZwartCm = -1000.0f;
   // Afstandsvenster (encoders): hetzelfde aantal cm, ongeacht de snelheid.
   bool bochtAanstaande = (randZwartCm >= 0.0f) &&
                          (s.distanceCm - randZwartCm < RobotConfig::BOCHT_AANKONDIG_CM);
@@ -188,9 +238,9 @@ void LijnVolgenToestand::update() {
       && robot.getBaanPlan().isVerwacht(CP_GROEN, s.distanceCm)
       && maxWaarde >= DREMPEL_LIJN && robot.getLijnAnalyse().isGroeneLijn()) {
     if (++groenTeller >= RobotConfig::GROEN_BEVESTIG) {
-      Serial.print(F("[GROEN] gedetecteerd (max="));
-      Serial.print(maxWaarde);
-      Serial.println(F(") -> GroeneLijnToestand"));
+      DBG.print(F("[GROEN] gedetecteerd (max="));
+      DBG.print(maxWaarde);
+      DBG.println(F(") -> GroeneLijnToestand"));
       robot.setState(new GroeneLijnToestand(robot));
       return;   // oude toestand is hierna verwijderd
     }
@@ -213,7 +263,7 @@ void LijnVolgenToestand::update() {
       if (!inStippelZone) {
         inStippelZone     = true;
         stippelZoneStartCm = s.distanceCm;
-        Serial.println(F("[STIPPELLIJN] enter zone (streepjes overbruggen)"));
+        DBG.println(F("[STIPPELLIJN] enter zone (streepjes overbruggen)"));
       }
       stippelGatCm = s.distanceCm;   // dit gat; einde-detectie meet hiervandaan
 
@@ -221,7 +271,7 @@ void LijnVolgenToestand::update() {
       // geen stippellijn maar een gemiste bocht -> zone afbreken en zoeken.
       if (s.distanceCm - stippelZoneStartCm > RobotConfig::STIPPEL_ZONE_MAX_CM) {
         inStippelZone = false;
-        Serial.println(F("[STIPPELLIJN] zone te lang -> geen stippellijn, zoek-pivot"));
+        DBG.println(F("[STIPPELLIJN] zone te lang -> geen stippellijn, zoek-pivot"));
         // val door naar de pivot hieronder
       } else {
         robot.getHardware().setMotorSpeeds(RobotConfig::SNELHEID_LAAG,
@@ -253,7 +303,7 @@ void LijnVolgenToestand::update() {
   if (inStippelZone) {
     if (s.distanceCm - stippelGatCm > RobotConfig::STIPPEL_EINDE_CM) {
       inStippelZone = false;
-      Serial.println(F("[STIPPELLIJN] exit zone (lijn weer doorlopend)"));
+      DBG.println(F("[STIPPELLIJN] exit zone (lijn weer doorlopend)"));
       if (robot.getBaanPlan().isVerwacht(CP_STIPPELLIJN, s.distanceCm)) {
         robot.getBaanPlan().rondAf(s.distanceCm);
       }
@@ -335,6 +385,12 @@ void LijnVolgenToestand::update() {
   int doel = map(abs(fout), 0, 2000,
                  RobotConfig::SNELHEID_RECHT, RobotConfig::SNELHEID_LAAG);
   if (bochtAanstaande || naBocht) doel = RobotConfig::SNELHEID_LAAG;   // bocht nabij/net gehad: langzaam
+  // Kruispunt op komst (grijs is de eerstvolgende checkpoint)? Alvast afremmen
+  // tot SNELHEID_NADER, zodat de grijs-detectie hieronder meer metingen krijgt
+  // en betrouwbaarder triggert (op volle snelheid schiet hij over het grijs).
+  if (kruispuntVerwacht && doel > RobotConfig::SNELHEID_NADER) {
+    doel = RobotConfig::SNELHEID_NADER;
+  }
   if (doel > basis) basis = min(doel, basis + 4);    // rustig optrekken
   else              basis = max(doel, basis - 12);   // vlot afremmen
 

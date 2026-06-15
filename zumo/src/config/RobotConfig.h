@@ -16,7 +16,8 @@ public:
   // --- Snelheden (0-400) — afstellen tijdens testen ---
   static constexpr int SNELHEID_MAX      = 400;
   static constexpr int SNELHEID_NORMAAL  = 250;   // basissnelheid op zwart (zet hoger voor vol gas)
-  static constexpr int SNELHEID_GRIJS    = 120;   // flink afremmen na grijs-detectie tot en met de afslag
+  static constexpr int SNELHEID_GRIJS    = 100;   // flink afremmen na grijs-detectie tot en met de afslag (slomer = beheerster afslaan)
+  static constexpr int SNELHEID_NADER    = 180;   // alvast afremmen ZODRA een kruispunt verwacht is (meer meettijd voor grijs)
   static constexpr int SNELHEID_GROEN    = 200;   // halve snelheid op groen (waarde uit main)
   static constexpr int SNELHEID_WIP      = 120;
   static constexpr int SNELHEID_ZOEKEN   = 150;
@@ -48,7 +49,7 @@ public:
   // detecties: hoger = strenger (minder vals, maar grijs moet duidelijker).
   // LET OP: BEVESTIG_LIJN moet <= 2 blijven, anders wint de scherpe-bocht-
   // detectie (2 metingen) de race en wordt grijs vlak voor een knik gemist.
-  static constexpr int GRIJS_BEVESTIG_LIJN = 2;   // opeenvolgende grijs-metingen nodig
+  static constexpr int GRIJS_BEVESTIG_LIJN = 2;   // opeenvolgende grijs-metingen nodig (MAX 2 — zie waarschuwing hierboven: 3 laat de bocht-detectie de race winnen)
   static constexpr int GRIJS_LIJN_MIDDEN   = 800; // lijn moet zo dicht bij het midden liggen (0..2000)
                                                   // (niet te krap: een echte markering trekt positie zelf al opzij)
   static constexpr int DREMPEL_CONTRAST  = 200;   // (ongebruikt; lijnvolgen draait op readLine)
@@ -60,20 +61,47 @@ public:
   // Vangnet: de markering-sensor moet ook zoveel BOVEN de laagste sensor
   // (het huidige wit) liggen — gekalibreerd zit wit bij ~0, dus dit vangt
   // vooral metingen af waarbij alles ongeveer even hoog is (geen markering).
-  static constexpr int GRIJS_BOVEN_WIT = 150;
+  static constexpr int GRIJS_BOVEN_WIT = 200;   // 150->200: strenger zonder de bocht-race te raken (echte markering steekt ruim boven wit uit)
+  // "Sterkste kant wint" was asymmetrisch (s0>=s4 vs s4>s0): leest de ene
+  // buitensensor structureel iets hoger (sensorverschil/lichtval), dan vuurde
+  // die kant nooit. Nu blokkeert een kant alleen als de ANDERE kant ECHT
+  // sterker is (meer dan deze marge) — klein ruisverschil telt niet meer mee.
+  static constexpr int GRIJS_KANT_MARGE = 150;
 
   // --- Afslaan op een splitsing (grijs = richtingshint) ---
   static constexpr int DREMPEL_SPLITS_MIN = 3;    // >= zoveel sensoren zwart + buitenrand zwart = splitsing
                                                   // (was 2: dan telt elke scherpe bocht al als splitsing)
-  static constexpr int SPLITS_BEVESTIG    = 2;    // zoveel metingen OP RIJ splitsing zien voor de afslag start
-  static constexpr int SPLITS_BIAS        = 2000; // hoe hard naar de gekozen tak duwen (fout-schaal +-2000)
+  static constexpr int SPLITS_BEVESTIG    = 1;    // zoveel metingen OP RIJ kruising/splitsing zien voor de afslag start
+                                                  // (1: een smalle dwarslijn op snelheid raakt de sensoren maar kort;
+                                                  //  2 miste dat soms -> hij reed rechtdoor. Richting komt uit het grijs,
+                                                  //  dus 1 trigger is genoeg om die kant op te draaien.)
+  static constexpr int SPLITS_BIAS        = 2000; // (ONGEBRUIKT sinds de afslag een draai-op-de-plek werd i.p.v. een gestuurde boog)
   // Vensters in CENTIMETERS (encoders), niet in tijd: dan gedraagt de robot
   // zich hetzelfde ongeacht de snelheid van dat moment.
   static constexpr float GRIJS_GELDIG_CM = 40.0f; // onthouden richting vervalt na deze afstand
   static constexpr float GRIJS_LOCK_CM   = 5.0f;  // na een grijs-detectie zo lang GEEN nieuwe richting aannemen
   // AFSLAG blijft in tijd: tijdens de afslag draaien de motoren tegengesteld
   // (gemiddelde afstand ~0), dus daar zegt de encoder-afstand niets.
-  static constexpr unsigned long AFSLAG_MS       = 350;  // VASTE duur van de afslag-bias (langer = scherper afslaan)
+  static constexpr unsigned long AFSLAG_MS       = 1200; // MAX duur van de afslag-bias (puur vangnet als de lijn niet teruggevonden wordt).
+                                                         // Ruim: de afslag eindigt normaal op de HOEK (AFSLAG_MIN_GRADEN + lijn
+                                                         // in het midden). Te krap en het vangnet kapt de 90-graden-draai af
+                                                         // VOOR de hoek bereikt is -> hij stopt alsnog op de rechtdoor-lijn.
+  // Afslag in twee fasen, gestuurd op de gedraaide hoek (encoder-odometrie):
+  //   FASE A: tot AFSLAG_MIN_GRADEN draait hij BLIND door — sensoren genegeerd.
+  //   FASE B: daarboven pakt hij de eerste lijn-in-het-midden (= de dwarstak).
+  // Op een PLUS-kruispunt loopt de lijn ook RECHTDOOR door. Die rechtdoor-lijn
+  // ligt vlak na de start van de draai nog in/bij het midden; zou hij daar al
+  // een lijn accepteren, dan "keert hij terug" naar rechtdoor. Door tot
+  // AFSLAG_MIN_GRADEN blind door te draaien staat hij ECHT voorbij rechtdoor
+  // voor hij iets accepteert. Voor een haakse (~90 graden) afslag moet deze
+  // dus ruim voorbij het punt liggen waar rechtdoor uit beeld is: 75 graden.
+  // Te laag = pakt rechtdoor (terugkeren); te hoog = draait voorbij de dwarstak.
+  static constexpr int AFSLAG_MIN_GRADEN         = 75;
+  // Bovengrens-vangnet: voorbij deze hoek is de dwarstak gemist -> toch
+  // overgeven aan de lijnvolger (die herstelt). Ruim boven 90 graden zodat een
+  // nette haakse afslag normaal op de LIJN eindigt, niet op dit vangnet.
+  static constexpr int AFSLAG_MAX_GRADEN         = 120;
+  static constexpr int AFSLAG_MIDDEN             = 400;  // lijn zo dicht bij het midden (0..2000) = afslag klaar
   // --- Groene lijn (module uit main) ---
   // Groen = donkerste sensor in deze GEKALIBREERDE band (tussen wit en zwart).
   // Zet GROEN_ACTIEF op false om de module snel uit te schakelen bij testen.
@@ -152,7 +180,7 @@ public:
   // voorbij. Vangnet: duurt de zone langer dan STIPPEL_ZONE_MAX_CM zonder dat
   // einde, dan was het geen stippellijn maar een gemiste bocht -> pivoteren.
   static constexpr float STIPPEL_EINDE_CM    = 8.0f;   // zoveel cm doorlopend zwart = streepjes voorbij
-  static constexpr float STIPPEL_ZONE_MAX_CM = 35.0f;  // zone langer dan dit = geen stippellijn (abort)
+  static constexpr float STIPPEL_ZONE_MAX_CM = 60.0f;  // zone langer dan dit = geen stippellijn (abort)
 
   // Zijgeheugen: lag de lijn korter dan dit aantal cm geleden DUIDELIJK aan
   // een kant (sterkste sensor = een buitensensor), en is de lijn nu weg?
@@ -166,6 +194,12 @@ public:
   // Minimale afstand tussen twee checkpoint-afrondingen: voorkomt dubbel
   // tellen (groen-flapje, twee gaten van dezelfde stippellijn vlak na elkaar).
   static constexpr float CP_MIN_AFSTAND_CM = 15.0f;
+
+  // TIJDELIJK: bij welk checkpoint begint het plan? 0 = normaal vanaf het
+  // begin (stippellijn 1). Zet op 4 om bij het eerste KRUISPUNT (grijze lijn,
+  // checkpoint 5 in het plan) te starten — handig om daar los te testen.
+  // (Index, dus 0-gebaseerd: checkpoint N in het plan = index N-1.)
+  static constexpr int START_CHECKPOINT = 0;
 
   // Helling/wip-checkpoint via de versnellingsmeter. LET OP: hard remmen
   // leest ook als ~10 graden "kantelen" (een accelerometer kan dat niet

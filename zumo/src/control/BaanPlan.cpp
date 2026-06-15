@@ -1,5 +1,7 @@
 #include "BaanPlan.h"
 #include "../config/RobotConfig.h"
+#include "../config/Debug.h"
+#include "../hardware/ZumoHardware.h"   // voor de checkpoint-piep in rondAf()
 
 // --- HET PLAN: de vaste volgorde van de baan ---
 // vanafCm/totCm = afstandsvenster vanaf de start (encoders). 0/0 = venster
@@ -45,13 +47,20 @@ static const __FlashStringHelper* naamVan(Checkpoint type) {
 }
 
 void BaanPlan::reset(float huidigeCm) {
-  index   = 0;
+  // TIJDELIJK startpunt: begin niet altijd bij checkpoint 1, maar bij de in
+  // RobotConfig ingestelde index (bv. 4 = eerste kruispunt/grijs). Begrensd,
+  // zodat een te hoge waarde het plan niet meteen op KLAAR zet.
+  index   = (RobotConfig::START_CHECKPOINT >= 0 &&
+             RobotConfig::START_CHECKPOINT < AANTAL)
+              ? (uint8_t)RobotConfig::START_CHECKPOINT : 0;
   startCm = huidigeCm;
   laatsteAfrondCm = -1000.0f;
-  Serial.print(F("[PLAN] reset: "));
-  Serial.print(AANTAL);
-  Serial.print(F(" checkpoints, eerste = "));
-  Serial.println(naamVan(PLAN[0].type));
+  DBG.print(F("[PLAN] reset: "));
+  DBG.print(AANTAL);
+  DBG.print(F(" checkpoints, start bij "));
+  DBG.print(index + 1);
+  DBG.print(F(" = "));
+  DBG.println(naamVan(PLAN[index].type));
 }
 
 Checkpoint BaanPlan::verwacht() const {
@@ -76,20 +85,24 @@ bool BaanPlan::isVerwacht(Checkpoint type, float huidigeCm) const {
 void BaanPlan::rondAf(float huidigeCm) {
   if (index >= AANTAL) return;
   laatsteAfrondCm = huidigeCm;
-  Serial.print(F("[PLAN] checkpoint "));
-  Serial.print(index + 1);
-  Serial.print(F("/"));
-  Serial.print(AANTAL);
-  Serial.print(F(" ("));
-  Serial.print(naamVan(PLAN[index].type));
-  Serial.print(F(") afgerond op "));
-  Serial.print(huidigeCm - startCm);
-  Serial.println(F(" cm"));
+  // Hoorbaar: elke checkpoint-afronding (+1) geeft een korte piep. Centraal
+  // hier, zodat het GEGARANDEERD klinkt vanuit elke toestand die rondAf()
+  // aanroept (kruispunt, groen, stippellijn, helling) — niet per plek apart.
+  if (hardware != nullptr) hardware->speelCheckpointGeluid();
+  DBG.print(F("[PLAN] checkpoint "));
+  DBG.print(index + 1);
+  DBG.print(F("/"));
+  DBG.print(AANTAL);
+  DBG.print(F(" ("));
+  DBG.print(naamVan(PLAN[index].type));
+  DBG.print(F(") afgerond op "));
+  DBG.print(huidigeCm - startCm);
+  DBG.println(F(" cm"));
   index++;
   if (index < AANTAL) {
-    Serial.print(F("[PLAN] volgende: "));
-    Serial.println(naamVan(PLAN[index].type));
+    DBG.print(F("[PLAN] volgende: "));
+    DBG.println(naamVan(PLAN[index].type));
   } else {
-    Serial.println(F("[PLAN] alle checkpoints afgerond!"));
+    DBG.println(F("[PLAN] alle checkpoints afgerond!"));
   }
 }

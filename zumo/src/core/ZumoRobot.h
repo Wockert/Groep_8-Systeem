@@ -10,9 +10,7 @@
 #include "../config/SensorData.h"
 #include "../hardware/ZumoHardware.h"
 #include "../sensors/LineSensorAnalyse.h"
-#include "../sensors/PitchDetector.h"
 #include "../control/RijController.h"
-#include "../control/BlokZoeker.h"
 #include "../control/BaanPlan.h"
 
 class RobotToestand;   // forward declaration (alleen pointer nodig)
@@ -31,9 +29,7 @@ private:
   // --- 1:1 associaties uit het UML (door ZumoRobot gecoordineerd) ---
   ZumoHardware     hardware;
   LineSensorAnalyse lijnAnalyse;
-  PitchDetector    pitchDetector;
   RijController    rijController;
-  BlokZoeker       blokZoeker;
   BaanPlan         baanPlan;
   SensorData       sensorData;
 

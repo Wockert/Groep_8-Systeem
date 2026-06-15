@@ -77,6 +77,13 @@ void ZumoHardware::print(String text) {
 void ZumoHardware::playDoneSound() {
 }
 
+// Korte, opvallende piep telkens als een checkpoint afgerond is (de +1 in het
+// baanplan). Niet-blokkerend: de buzzer speelt op de achtergrond, dus dit
+// houdt de regellus niet op. Frequentie in Hz, duur in ms, volume 0..15.
+void ZumoHardware::speelCheckpointGeluid() {
+  buzzer.playFrequency(1500, 120, 12);
+}
+
 long ZumoHardware::getTicksLinks()  { return encoders.getCountsLeft();  }
 long ZumoHardware::getTicksRechts() { return encoders.getCountsRight(); }
 

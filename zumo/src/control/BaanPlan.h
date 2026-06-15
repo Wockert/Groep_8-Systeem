@@ -14,6 +14,8 @@
 
 #include <Arduino.h>
 
+class ZumoHardware;   // forward declaration (alleen een pointer nodig voor de checkpoint-piep)
+
 // Typen checkpoints op de baan.
 enum Checkpoint : uint8_t {
   CP_STIPPELLIJN = 0,
@@ -30,8 +32,10 @@ private:
   float   startCm = 0.0f;       // encoderstand bij de start; afstanden tellen vanaf hier
   float   laatsteAfrondCm = -1000.0f;   // waar de vorige checkpoint afgerond is
                                         // (CP_MIN_AFSTAND_CM ertussen = geen dubbel tellen)
+  ZumoHardware* hardware = nullptr;     // voor de checkpoint-piep (optioneel: nullptr = stil)
 
 public:
+  void koppel(ZumoHardware& hw) { hardware = &hw; }   // 1x in setup(): hardware voor de piep
   void reset(float huidigeCm);              // bij de start (knop A) aanroepen
   Checkpoint verwacht() const;              // welk type is nu aan de beurt?
   // Mag een detectie van dit type NU tellen? Type moet aan de beurt zijn,

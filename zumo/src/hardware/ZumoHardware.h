@@ -18,6 +18,7 @@ private:
   Zumo32U4IMU              imu;
   Zumo32U4ProximitySensors prox;
   Zumo32U4Encoders         encoders;
+  Zumo32U4Buzzer           buzzer;
   Zumo32U4ButtonA          knopA;
   Zumo32U4ButtonB          knopB;
   Zumo32U4ButtonC          knopC;
@@ -32,6 +33,7 @@ public:
   void stopMotors();
   void print(String text);
   void playDoneSound();
+  void speelCheckpointGeluid();   // korte piep telkens als een checkpoint afgerond wordt (+1)
   long getTicksLinks();    // ruwe encoderstanden (cumulatief sinds opstarten),
   long getTicksRechts();   // voor draaihoek-odometrie tijdens scherpe bochten
 

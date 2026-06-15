@@ -1,12 +1,18 @@
 #include "ZumoRobot.h"
 #include "RobotToestand.h"
 #include "../config/RobotConfig.h"
+#include "../config/Debug.h"
 #include "../states/StartToestand.h"
 
+#if !DEBUG
+NullSerial DBG;   // de enige definitie van de lege debug-uitgang (zie Debug.h)
+#endif
+
 void ZumoRobot::setup() {
-  Serial.begin(9600);                    // seriële monitor voor printSensorData()
+  Serial.begin(9600);                    // USB seriële monitor (ijk-feedback + DBG bij DEBUG=1)
   hardware.init();                       // sensoren, IMU en encoders opstarten
   rijController.koppel(hardware);        // controller mag nu de motoren aansturen
+  baanPlan.koppel(hardware);             // baanplan mag nu piepen bij elke checkpoint (+1)
 
   sensorData = hardware.leesSnapshot();  // eerste momentopname
   printSensorData();                     // toon de beginmeting

@@ -84,15 +84,17 @@ bool LineSensorAnalyse::grijsTapeLinks() {
   return isGrijs(sensorWaarden[0])
       && sensorWaarden[0] - witNiveau() > RobotConfig::GRIJS_BOVEN_WIT  // steekt echt boven wit uit
       && sensorWaarden[1] < RobotConfig::DREMPEL_GRIJS_L  // binnenbuur wit: scheiding lijn<->markering
-      && sensorWaarden[0] >= sensorWaarden[4];            // sterkste kant wint
+      // sterkste kant wint, MAAR symmetrisch: links blokkeert alleen als
+      // rechts ECHT sterker is (> marge), niet bij klein sensorverschil.
+      && sensorWaarden[4] - sensorWaarden[0] <= RobotConfig::GRIJS_KANT_MARGE;
 }
 
-// Grijze markering rechts = idem, gespiegeld.
+// Grijze markering rechts = idem, gespiegeld (zelfde symmetrische marge).
 bool LineSensorAnalyse::grijsTapeRechts() {
   return isGrijs(sensorWaarden[4])
       && sensorWaarden[4] - witNiveau() > RobotConfig::GRIJS_BOVEN_WIT
       && sensorWaarden[3] < RobotConfig::DREMPEL_GRIJS_L
-      && sensorWaarden[4] >  sensorWaarden[0];
+      && sensorWaarden[0] - sensorWaarden[4] <= RobotConfig::GRIJS_KANT_MARGE;
 }
 
 // Grijs aan beide kanten tegelijk.
