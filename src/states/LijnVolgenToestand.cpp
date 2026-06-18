@@ -198,62 +198,72 @@ void LijnVolgenToestand::update() {
     groenTeller = 0;
   }
 
-  // --- Lijn helemaal kwijt? ---
+  // --- Lijn kwijt? ---
+  // Aanpak: bij een gat NIET meteen gaan zoeken/draaien, maar gewoon
+  // RECHTDOOR blijven rijden tot de lijn weer verschijnt. Zo zigzagt hij niet
+  // meer over stippellijnen/gaten. ALLEEN pivoteren als er een duidelijke
+  // scherpe-bocht-aanwijzing is van vlak voordat de lijn verdween:
+  //   - bochtAanstaande: een buitensensor zag net zwart wegdraaien, OF
+  //   - zijNetGezien:    de lijn lag net duidelijk op een buitensensor (0/4).
   if (maxWaarde < DREMPEL_LIJN) {
-    // BAANPLAN-GATING: rechtdoor oversteken mag ALLEEN als stippellijn de
-    // verwachte checkpoint is (of we al in zo'n stippel-zone zitten). Valt de
-    // lijn weg terwijl stippellijn NIET aan de beurt is, dan is het geen
-    // hiaat maar een bocht -> pivoteren (net als grijs/groen).
-    bool stippellijnVerwacht = robot.getBaanPlan().isVerwacht(CP_STIPPELLIJN, s.distanceCm);
-
-    // --- Stippel-zone: meerdere streepjes overbruggen ---
-    // In de zone (of: stippellijn verwacht en hier begint hij): rustig
-    // rechtdoor. De zone overbrugt ALLE gaten tot de lijn weer doorlopend is.
-    if (stippellijnVerwacht || inStippelZone) {
-      if (!inStippelZone) {
-        inStippelZone     = true;
-        stippelZoneStartCm = s.distanceCm;
-        Serial.println(F("[STIPPELLIJN] enter zone (streepjes overbruggen)"));
-      }
-      stippelGatCm = s.distanceCm;   // dit gat; einde-detectie meet hiervandaan
-
-      // Vangnet: duurt de zone te lang zonder doorlopende lijn, dan was het
-      // geen stippellijn maar een gemiste bocht -> zone afbreken en zoeken.
-      if (s.distanceCm - stippelZoneStartCm > RobotConfig::STIPPEL_ZONE_MAX_CM) {
-        inStippelZone = false;
-        Serial.println(F("[STIPPELLIJN] zone te lang -> geen stippellijn, zoek-pivot"));
-        // val door naar de pivot hieronder
-      } else {
-        robot.getHardware().setMotorSpeeds(RobotConfig::SNELHEID_LAAG,
-                                           RobotConfig::SNELHEID_LAAG);
-        return;
-      }
-    }
-
-    // Geen stippel(zone): lijn weg = bocht. Pivoteer naar de beste aanwijzing.
     bool zijNetGezien = (zwartZijKant != 0) && (zwartZijCm >= 0.0f) &&
                         (s.distanceCm - zwartZijCm < RobotConfig::LIJN_KWIJT_GEHEUGEN_CM);
-    inBocht = true;
-    if (bochtAanstaande)             bochtKant = randZwartKant;
-    else if (zijNetGezien)           bochtKant = zwartZijKant;
-    else if (abs(vorigeFout) > 1000) bochtKant = (vorigeFout < 0) ? -1 : +1;
-    else                             bochtKant = (foutSom < 0) ? -1 : +1;  // trend
-    bochtTicksL = robot.getHardware().getTicksLinks();    // nulpunt voor de
-    bochtTicksR = robot.getHardware().getTicksRechts();   // draaihoek-meting
-    int p = RobotConfig::SNELHEID_BOCHT;
-    if (bochtKant < 0) robot.getHardware().setMotorSpeeds(-p, p);
-    else               robot.getHardware().setMotorSpeeds(p, -p);
+
+    // 1) Scherpe bocht (links of rechts zag net zwart) -> die kant op pivoteren.
+    if (bochtAanstaande || zijNetGezien) {
+      inBocht   = true;
+      bochtKant = bochtAanstaande ? randZwartKant : zwartZijKant;
+      bochtTicksL = robot.getHardware().getTicksLinks();    // nulpunt voor de
+      bochtTicksR = robot.getHardware().getTicksRechts();   // draaihoek-meting
+      int p = RobotConfig::SNELHEID_BOCHT;
+      if (bochtKant < 0) robot.getHardware().setMotorSpeeds(-p, p);
+      else               robot.getHardware().setMotorSpeeds(p, -p);
+      return;
+    }
+
+    // 2) Geen bocht-aanwijzing -> gewoon een gat. Rechtdoor blijven rijden tot
+    //    de lijn weer verschijnt. De afgelegde gat-afstand houden we bij voor
+    //    (a) het afronden van een stippellijn-checkpoint (zie "lijn in beeld")
+    //    en (b) een vangnet.
+    if (!inStippelZone) {
+      inStippelZone      = true;
+      stippelZoneStartCm = s.distanceCm;
+      Serial.println(F("[GAT] lijn kwijt zonder bocht -> rechtdoor overbruggen"));
+    }
+    stippelGatCm = s.distanceCm;   // laatste gat; einde-detectie meet hiervandaan
+
+    // Vangnet: blijft de lijn na heel veel cm WEG, dan reden we waarschijnlijk
+    // de baan af (gemiste bocht zonder rand-zwart). Dan alsnog gaan zoeken op
+    // de laatste stuur-trend.
+    if (s.distanceCm - stippelZoneStartCm > RobotConfig::STIPPEL_ZONE_MAX_CM) {
+      inStippelZone = false;
+      inBocht       = true;
+      bochtKant     = (foutSom < 0) ? -1 : +1;
+      bochtTicksL   = robot.getHardware().getTicksLinks();
+      bochtTicksR   = robot.getHardware().getTicksRechts();
+      int p = RobotConfig::SNELHEID_BOCHT;
+      if (bochtKant < 0) robot.getHardware().setMotorSpeeds(-p, p);
+      else               robot.getHardware().setMotorSpeeds(p, -p);
+      Serial.println(F("[GAT] te lang geen lijn -> alsnog zoeken (pivot)"));
+      return;
+    }
+
+    // Recht vooruit het gat over.
+    robot.getHardware().setMotorSpeeds(RobotConfig::SNELHEID_LAAG,
+                                       RobotConfig::SNELHEID_LAAG);
     return;
   }
 
   // --- Lijn in beeld ---
-  // In een stippel-zone? Dan is de zone (en het checkpoint) klaar zodra de
-  // lijn weer STIPPEL_EINDE_CM AANEENGESLOTEN zwart is: de streepjes zijn
-  // voorbij. Tussendoor (kort zwart tussen twee streepjes) blijft de zone aan.
+  // Net een gat overbrugd (gat-zone)? Dan is de zone klaar zodra de lijn weer
+  // STIPPEL_EINDE_CM AANEENGESLOTEN zwart is: de streepjes/het gat zijn voorbij.
+  // Tussendoor (kort zwart tussen twee streepjes) blijft de zone aan, zodat een
+  // stippellijn met meerdere gaten in één keer overbrugd wordt. Was hier een
+  // stippellijn-checkpoint aan de beurt, dan vinken we die nu af.
   if (inStippelZone) {
     if (s.distanceCm - stippelGatCm > RobotConfig::STIPPEL_EINDE_CM) {
       inStippelZone = false;
-      Serial.println(F("[STIPPELLIJN] exit zone (lijn weer doorlopend)"));
+      Serial.println(F("[GAT] lijn weer doorlopend -> gat-zone uit"));
       if (robot.getBaanPlan().isVerwacht(CP_STIPPELLIJN, s.distanceCm)) {
         robot.getBaanPlan().rondAf(s.distanceCm);
       }
