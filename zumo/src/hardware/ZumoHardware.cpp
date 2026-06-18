@@ -52,9 +52,8 @@ bool ZumoHardware::kalibreerLijn() {
 // motorstanden, zelfde aantal stappen én zelfde sensors.calibrate()-aanroep
 // (zodat de timing per stap — en dus de gedraaide hoek — identiek is). Dat
 // corrumpeert de zwart/wit-schaal niet: calibrate() verruimt alleen min/max, en
-// groen ligt TUSSEN wit en zwart, dus binnen het al geleerde bereik. Daarnaast
-// leest hij de gekalibreerde groen-piek op de middelste drie sensoren (0/4
-// onbetrouwbaar). Zet de robot op een schoon stuk groen.
+// groen ligt TUSSEN wit en zwart, dus binnen het al geleerde bereik. Leest de
+// groen-piek over alle 5 sensoren. Zet de robot op een schoon stuk groen.
 int ZumoHardware::kalibreerGroenVegend() {
   int piek = 0;
   for (uint16_t i = 0; i < 120; i++) {
@@ -63,7 +62,7 @@ int ZumoHardware::kalibreerGroenVegend() {
     sensors.calibrate();                                  // identiek aan zwart
     unsigned int cal[5] = {0};
     sensors.readCalibrated(cal);                          // gekalibreerd: 0=wit..1000=zwart
-    for (uint8_t k = 1; k <= 3; k++)
+    for (uint8_t k = 0; k < 5; k++)
       if ((int)cal[k] > piek) piek = (int)cal[k];
   }
   motors.setSpeeds(0, 0);

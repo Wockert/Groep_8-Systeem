@@ -66,14 +66,12 @@ void LineSensorAnalyse::ijkGroen(int waarde) {
 
 // Groene lijn: de donkerste sensor geeft de kleur recht onder de robot. Groen
 // kaatst meer IR terug dan zwart -> een middenwaarde tussen wit en zwart.
-// LET OP: alleen de MIDDELSTE drie sensoren (1,2,3). De buitenste (0 en 4)
-// blijven onbetrouwbaar op ~1000 hangen; nemen we die mee, dan is de max altijd
-// ~1000 en wordt groen NOOIT herkend.
+// Alle 5 sensoren worden meegenomen; de ijking meet ook over alle 5.
 // Is groen geijkt (groenNiveau > 0)? Dan een band van +-GROEN_MARGE rond de
 // gemeten waarde. Anders de vaste drempels DREMPEL_GROEN_L..H.
 bool LineSensorAnalyse::isGroeneLijn() {
   int maxWaarde = 0;
-  for (int i = 1; i <= 3; i++)
+  for (int i = 0; i < 5; i++)
     if (sensorWaarden[i] > maxWaarde) maxWaarde = sensorWaarden[i];
 
   int laag = (groenNiveau > 0) ? groenNiveau - RobotConfig::GROEN_MARGE : RobotConfig::DREMPEL_GROEN_L;
