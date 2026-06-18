@@ -3,14 +3,6 @@
 
 BlokZoekToestand::BlokZoekToestand(ZumoRobot& robot) : RobotToestand(robot) {}
 
-void BlokZoekToestand::enter()  {
-
-}
-
-void BlokZoekToestand::update() {
-
-}
-
-void BlokZoekToestand::exit()   {
-
-}
+void BlokZoekToestand::enter()  {}
+void BlokZoekToestand::update() {}
+void BlokZoekToestand::exit()   {}

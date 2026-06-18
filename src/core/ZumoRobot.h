@@ -13,6 +13,7 @@
 #include "../sensors/PitchDetector.h"
 #include "../control/RijController.h"
 #include "../control/BlokZoeker.h"
+#include "../control/BaanPlan.h"
 
 class RobotToestand;   // forward declaration (alleen pointer nodig)
 
@@ -33,14 +34,25 @@ private:
   PitchDetector    pitchDetector;
   RijController    rijController;
   BlokZoeker       blokZoeker;
+  BaanPlan         baanPlan;
   SensorData       sensorData;
+
+  // Print de huidige snapshot naar de seriële monitor (debug/controle).
+  void printSensorData();
 
 public:
   void setup();
   void loop();
   void setState(RobotToestand* staat);
   void update();
-  ZumoHardware& getHardware() { return hardware; }
-  LineSensorAnalyse& getLijnAnalyse() { return lijnAnalyse; }
 
+  // Geeft de snapshot van deze ronde terug. Toestanden lezen hieruit
+  // (via hun robot-referentie) zodat iedereen dezelfde meting gebruikt.
+  const SensorData& getSensorData() const;
+
+  // Toegang voor de toestanden tot de serviceklassen.
+  ZumoHardware&      getHardware()     { return hardware; }
+  RijController&     getRijController() { return rijController; }
+  LineSensorAnalyse& getLijnAnalyse()  { return lijnAnalyse; }
+  BaanPlan&          getBaanPlan()     { return baanPlan; }
 };
