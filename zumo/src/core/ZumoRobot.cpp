@@ -81,6 +81,5 @@ void ZumoRobot::printSensorData() {
   Serial.print(F(" gR="));  Serial.print(lijnAnalyse.grijsTapeRechts());
   Serial.print(F(" kr="));  Serial.print(lijnAnalyse.isKruising());
   Serial.print(F(" gN="));  Serial.print(lijnAnalyse.getGrijsNiveau());   // geijkt grijs-niveau (0=niet)
-  Serial.print(F(" cp="));  Serial.print(baanPlan.getIndex());            // eerstvolgende checkpoint (0-based)
   Serial.println();
 }

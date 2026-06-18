@@ -34,9 +34,6 @@ public:
   // schaal. Die is drift-vast: accu/licht verschuiven de rauwe waarden, maar
   // na kalibratie landen wit/grijs/zwart altijd op dezelfde plek.
   // !! Afstellen via 'L=' in de Serial Monitor (toont nu gekalibreerd).
-  // Weer AAN: het baanplan (BaanPlan) laat grijs alleen nog tellen als een
-  // kruispunt ook echt de eerstvolgende checkpoint is, dus de valse
-  // detecties op bochtranden kunnen geen toestand meer starten.
   static constexpr bool GRIJS_ACTIEF     = true;
 
   static constexpr int DREMPEL_ZWART     = 700;   // GEKALIBREERD: > dit = zwart

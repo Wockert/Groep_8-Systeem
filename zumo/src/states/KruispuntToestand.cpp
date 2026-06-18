@@ -49,7 +49,6 @@ void KruispuntToestand::update() {
                                        RobotConfig::SNELHEID_GRIJS - correctie);
     if (millis() - afslagTijd > RobotConfig::AFSLAG_MS) {
       Serial.println(F("[AFSLAG] klaar"));
-      robot.getBaanPlan().rondAf(robot.getSensorData().distanceCm);   // kruispunt-checkpoint afgerond
       robot.setState(new LijnVolgenToestand(robot));
     }
     return;   // (na setState is deze toestand verwijderd)

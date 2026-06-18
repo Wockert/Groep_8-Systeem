@@ -34,7 +34,6 @@ void GroeneLijnToestand::update() {
   if (!robot.getLijnAnalyse().isGroeneLijn()) {
     if (++zwartTeller >= RobotConfig::GROEN_BEVESTIG) {
       Serial.println(F("[GROEN] exit: geen groen meer -> zwarte lijnvolger"));
-      robot.getBaanPlan().rondAf(s.distanceCm);   // groen-checkpoint afgerond
       robot.setState(new LijnVolgenToestand(robot));
       return;   // oude toestand is hierna verwijderd
     }

@@ -39,6 +39,11 @@ public:
   long getTicksLinks();    // ruwe encoderstanden (cumulatief sinds opstarten),
   long getTicksRechts();   // voor draaihoek-odometrie tijdens scherpe bochten
 
+  void    readRawLine(unsigned int sensorWaarden[]);
+  void    readProximity();
+  uint8_t getProxLeft();
+  uint8_t getProxRight();
+
   // Leest alle sensoren in EEN keer uit en geeft een SensorData-momentopname
   // terug. ZumoRobot roept dit aan bovenaan elke ronde, zodat elke klasse in
   // die ronde exact dezelfde meting ziet (zie SensorData <<snapshot>>).

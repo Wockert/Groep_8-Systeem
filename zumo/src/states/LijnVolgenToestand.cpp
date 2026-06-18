@@ -67,12 +67,9 @@ void LijnVolgenToestand::update() {
   //      achtige gradient -> dat is GEEN markering. Alleen op (bijna) recht.
   //   3) Grijs moet GRIJS_BEVESTIG_LIJN metingen ACHTER ELKAAR gezien zijn
   //      (debounce tegen losse ruispieken).
-  // BAANPLAN-GATING: grijs telt alleen als een KRUISPUNT aan de beurt is.
-  // Dat haalt de valse grijs-detecties (bochtranden!) er structureel uit.
-  bool kruispuntVerwacht = robot.getBaanPlan().isVerwacht(CP_KRUISPUNT, s.distanceCm);
   LineSensorAnalyse& lijn = robot.getLijnAnalyse();
-  bool grijsL = RobotConfig::GRIJS_ACTIEF && kruispuntVerwacht && lijn.grijsTapeLinks();
-  bool grijsR = RobotConfig::GRIJS_ACTIEF && kruispuntVerwacht && lijn.grijsTapeRechts();
+  bool grijsL = RobotConfig::GRIJS_ACTIEF && lijn.grijsTapeLinks();
+  bool grijsR = RobotConfig::GRIJS_ACTIEF && lijn.grijsTapeRechts();
   bool lijnRecht = (maxWaarde >= DREMPEL_LIJN)
                 && (abs(positie - 2000) < RobotConfig::GRIJS_LIJN_MIDDEN);
   if (!inBocht && lijnRecht && (grijsL || grijsR)) {
@@ -183,9 +180,7 @@ void LijnVolgenToestand::update() {
   // --- Groene lijn? -> overschakelen na GROEN_BEVESTIG bevestigingen ---
   // NIET rond bochten checken (aanstaande/net gehad): daar leest een halve
   // lijnrand precies zo'n middenwaarde als groen en zou hij vals overgaan.
-  // BAANPLAN-GATING: alleen als GROEN ook de eerstvolgende checkpoint is.
   if (RobotConfig::GROEN_ACTIEF && !bochtAanstaande && !naBocht
-      && robot.getBaanPlan().isVerwacht(CP_GROEN, s.distanceCm)
       && maxWaarde >= DREMPEL_LIJN && robot.getLijnAnalyse().isGroeneLijn()) {
     if (++groenTeller >= RobotConfig::GROEN_BEVESTIG) {
       Serial.print(F("[GROEN] gedetecteerd (max="));
@@ -200,11 +195,9 @@ void LijnVolgenToestand::update() {
 
   // --- Lijn helemaal kwijt? ---
   if (maxWaarde < DREMPEL_LIJN) {
-    // BAANPLAN-GATING: rechtdoor oversteken mag ALLEEN als stippellijn de
-    // verwachte checkpoint is (of we al in zo'n stippel-zone zitten). Valt de
-    // lijn weg terwijl stippellijn NIET aan de beurt is, dan is het geen
-    // hiaat maar een bocht -> pivoteren (net als grijs/groen).
-    bool stippellijnVerwacht = robot.getBaanPlan().isVerwacht(CP_STIPPELLIJN, s.distanceCm);
+    // Geen aangekondigde bocht? Dan lijn-weg behandelen als stippellijn
+    // (rechtdoor overbruggen). Als er wél een bocht aanstaande was, pivoteren.
+    bool stippellijnVerwacht = !bochtAanstaande;
 
     // --- Stippel-zone: meerdere streepjes overbruggen ---
     // In de zone (of: stippellijn verwacht en hier begint hij): rustig
@@ -254,27 +247,7 @@ void LijnVolgenToestand::update() {
     if (s.distanceCm - stippelGatCm > RobotConfig::STIPPEL_EINDE_CM) {
       inStippelZone = false;
       Serial.println(F("[STIPPELLIJN] exit zone (lijn weer doorlopend)"));
-      if (robot.getBaanPlan().isVerwacht(CP_STIPPELLIJN, s.distanceCm)) {
-        robot.getBaanPlan().rondAf(s.distanceCm);
-      }
     }
-  }
-
-  // --- Helling/wip via de pitch-sensor ---
-  // Is OMHOOG of WIP de verwachte checkpoint en wijst de neus een paar
-  // metingen achter elkaar duidelijk omhoog/omlaag, dan is hij gepasseerd.
-  // (Geen aparte toestand nodig: hij blijft gewoon de lijn volgen.)
-  // LET OP: de drempel en bevestiging staan bewust hoog — hard remmen leest
-  // op de versnellingsmeter ook als ~10 graden kantelen, en dat mag de
-  // checkpoint niet afvinken.
-  Checkpoint vw = robot.getBaanPlan().verwacht();
-  if ((vw == CP_OMHOOG || vw == CP_WIP) && fabs(s.pitch) > RobotConfig::PITCH_GRADEN) {
-    if (++pitchTeller >= RobotConfig::PITCH_BEVESTIG) {
-      robot.getBaanPlan().rondAf(s.distanceCm);
-      pitchTeller = 0;
-    }
-  } else {
-    pitchTeller = 0;
   }
 
   // --- PD-lijnvolgen (branch Lijnsensorvolgen-Verbeteren) ---

@@ -108,6 +108,22 @@ void ZumoHardware::speelGroenGeluid() {
 long ZumoHardware::getTicksLinks()  { return encoders.getCountsLeft();  }
 long ZumoHardware::getTicksRechts() { return encoders.getCountsRight(); }
 
+void ZumoHardware::readRawLine(unsigned int sensorWaarden[]) {
+  sensors.read(sensorWaarden);
+}
+
+void ZumoHardware::readProximity() {
+  prox.read();
+}
+
+uint8_t ZumoHardware::getProxLeft() {
+  return prox.countsFrontWithLeftLeds();
+}
+
+uint8_t ZumoHardware::getProxRight() {
+  return prox.countsFrontWithRightLeds();
+}
+
 // -------------------------------------------------------------
 //  leesSnapshot()  -  vult EEN SensorData met alle sensoren tegelijk.
 //  Let op: init() moet de gebruikte sensoren eerst hebben opgestart

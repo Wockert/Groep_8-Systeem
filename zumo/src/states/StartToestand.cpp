@@ -92,9 +92,6 @@ void StartToestand::update() {
       Serial.println(kalStap);
       return;
     }
-    // Baanplan opnieuw vanaf checkpoint 1, met de huidige encoderstand als
-    // nulpunt voor de afstandsvensters.
-    robot.getBaanPlan().reset(robot.getSensorData().distanceCm);
     robot.setState(new LijnVolgenToestand(robot));
     return;   // belangrijk: oude toestand is hierna verwijderd
   }
