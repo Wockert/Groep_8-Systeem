@@ -51,7 +51,6 @@ public:
   static constexpr int GRIJS_BEVESTIG_LIJN = 2;   // opeenvolgende grijs-metingen nodig
   static constexpr int GRIJS_LIJN_MIDDEN   = 800; // lijn moet zo dicht bij het midden liggen (0..2000)
                                                   // (niet te krap: een echte markering trekt positie zelf al opzij)
-  static constexpr int DREMPEL_CONTRAST  = 200;   // (ongebruikt; lijnvolgen draait op readLine)
 
   // Grijs werkt NET ALS ZWART: vaste band op de GEKALIBREERDE waarde (zie
   // DREMPEL_GRIJS_L/H hierboven). Na ijken met knop B geldt in plaats
@@ -88,9 +87,7 @@ public:
   static constexpr int DREMPEL_BRUIN_L   = 0;
   static constexpr int DREMPEL_BRUIN_H   = 0;
 
-  // --- Timing & afstand ---
-  static constexpr int   GEHEUGEN_MS     = 0;
-  static constexpr int   DOORRIJDEN_CM   = 0;
+
   // Door het team gemeten en getest: 0.019 cm per encodertick/pulse.
   // (afstand = gemiddelde van links+rechts ticks * deze waarde)
   static constexpr float CM_PER_PULSE    = 0.019f;
