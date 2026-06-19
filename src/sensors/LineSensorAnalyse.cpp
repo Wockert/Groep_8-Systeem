@@ -82,7 +82,7 @@ bool LineSensorAnalyse::isGroeneLijn() {
 }
 
 bool LineSensorAnalyse::isBruineLijn() {
-  return false;   // (nog niet nodig voor deze opdracht)
+  return false;   // (nog niet verwerkt )
 }
 
 // Grijze markering links = linker buitenste sensor in de grijs-band, ÉN de
@@ -111,5 +111,5 @@ bool LineSensorAnalyse::grijsTapeBeiden() {
 }
 
 bool LineSensorAnalyse::startLijnGezien() {
-  return false;   // (nog niet nodig voor deze opdracht)
+  return false;   // (nog niet verwerkt )
 }

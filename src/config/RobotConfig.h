@@ -15,7 +15,7 @@ public:
 
   // --- Snelheden (0-400) — afstellen tijdens testen ---
   static constexpr int SNELHEID_MAX      = 250;
-  static constexpr int SNELHEID_NORMAAL  = 250;   // basissnelheid op zwart (zet hoger voor vol gas)
+  static constexpr int SNELHEID_NORMAAL  = 200;   // basissnelheid op zwart (zet hoger voor vol gas)
   static constexpr int SNELHEID_GRIJS    = 120;   // flink afremmen na grijs-detectie tot en met de afslag
   static constexpr int SNELHEID_GROEN    = 200;   // halve snelheid op groen (waarde uit main)
   static constexpr int SNELHEID_WIP      = 120;
