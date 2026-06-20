@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['sensordata_0',['sensorData',['../class_zumo_robot.html#ab0a15150ab05e4430781155138691bc0',1,'ZumoRobot']]],
+  ['sensors_1',['sensors',['../class_zumo_hardware.html#a849536107d91819c3f461b4299408ce7',1,'ZumoHardware']]],
+  ['sensorwaarden_2',['sensorWaarden',['../class_line_sensor_analyse.html#aa99c85452e9e5b9c5c6472c2cd546ded',1,'LineSensorAnalyse::sensorWaarden'],['../class_lijn_volgen_toestand.html#ab2964b5e362cc3c7d19cefc5c8b9e592',1,'LijnVolgenToestand::sensorWaarden']]],
+  ['snelheid_3',['snelheid',['../class_robot_toestand.html#a6ebacd16a5ffbcbe2cd62e3634d92052',1,'RobotToestand']]],
+  ['snelheid_5fbocht_4',['SNELHEID_BOCHT',['../class_robot_config.html#a68e644e503a3fa56d58c53f52d14550c',1,'RobotConfig']]],
+  ['snelheid_5fgrijs_5',['SNELHEID_GRIJS',['../class_robot_config.html#a40400f08bb7ff71770255fdbd1b498db',1,'RobotConfig']]],
+  ['snelheid_5fgroen_6',['SNELHEID_GROEN',['../class_robot_config.html#a7682194b84869de59be3bbf35c9c4429',1,'RobotConfig']]],
+  ['snelheid_5flaag_7',['SNELHEID_LAAG',['../class_robot_config.html#ae81c6696b4f4216c939c266a51650688',1,'RobotConfig']]],
+  ['snelheid_5fmax_8',['SNELHEID_MAX',['../class_robot_config.html#a562293c2df46a5e6d74189d01d13e583',1,'RobotConfig']]],
+  ['snelheid_5fnormaal_9',['SNELHEID_NORMAAL',['../class_robot_config.html#ac8e0098ce9aeef7014007318e179b8b9',1,'RobotConfig']]],
+  ['snelheid_5frecht_10',['SNELHEID_RECHT',['../class_robot_config.html#a9c59e7be63e5c2f3d5862981a37edfc3',1,'RobotConfig']]],
+  ['snelheid_5fwip_11',['SNELHEID_WIP',['../class_robot_config.html#af583838c1fbe67caeda44699c1538a70',1,'RobotConfig']]],
+  ['snelheid_5fzoeken_12',['SNELHEID_ZOEKEN',['../class_robot_config.html#af53c53c4e3c890ef27356bf0d8b93393',1,'RobotConfig']]],
+  ['splits_5fbevestig_13',['SPLITS_BEVESTIG',['../class_robot_config.html#a16484ffbcda093614891e9052ce8fd23',1,'RobotConfig']]],
+  ['splits_5fbias_14',['SPLITS_BIAS',['../class_robot_config.html#abb523f8edf62dab76e2f98828c1403f8',1,'RobotConfig']]],
+  ['splitsteller_15',['splitsTeller',['../class_kruispunt_toestand.html#a7f4b0df1b67f0a079199cb4a74078860',1,'KruispuntToestand']]],
+  ['startcm_16',['startCm',['../class_baan_plan.html#aae73be0652e923241a90463c9bcfc7d8',1,'BaanPlan']]],
+  ['starttijd_17',['startTijd',['../class_rechtdoor_toestand.html#ad608836bdbd4571ea029a0290e4a201f',1,'RechtdoorToestand']]],
+  ['stippel_5feinde_5fcm_18',['STIPPEL_EINDE_CM',['../class_robot_config.html#a48a9432ca1213287637e8faf6627693b',1,'RobotConfig']]],
+  ['stippel_5fzone_5fmax_5fcm_19',['STIPPEL_ZONE_MAX_CM',['../class_robot_config.html#a4bafc0279002b952e8b4595ef4bcc8e2',1,'RobotConfig']]],
+  ['stippelgatcm_20',['stippelGatCm',['../class_lijn_volgen_toestand.html#a70610689fa5de8b5adde1b1d5ece8252',1,'LijnVolgenToestand']]],
+  ['stippelzonestartcm_21',['stippelZoneStartCm',['../class_lijn_volgen_toestand.html#a986f1daec6ec8412c3eb6aafeb1814d6',1,'LijnVolgenToestand']]]
+];

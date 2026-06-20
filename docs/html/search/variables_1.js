@@ -1,0 +1,23 @@
+var searchData=
+[
+  ['baanplan_0',['baanPlan',['../class_zumo_robot.html#a421a8b1c8397638df74d6e33df1aebd0',1,'ZumoRobot']]],
+  ['basis_1',['basis',['../class_groene_lijn_toestand.html#af6a881352ed60433f1ac931b229ed6a9',1,'GroeneLijnToestand::basis'],['../class_lijn_volgen_toestand.html#af01fb5e3416165691fa3a72a72d961ca',1,'LijnVolgenToestand::basis']]],
+  ['besterichting_2',['besteRichting',['../class_blok_zoeker.html#a488e84082dfe13ca996bc3c57f69a49d',1,'BlokZoeker']]],
+  ['bestewaarde_3',['besteWaarde',['../class_blok_zoeker.html#a76eb726eda37771e0e472d6acf167662',1,'BlokZoeker']]],
+  ['bezigmetafslaan_4',['bezigMetAfslaan',['../class_kruispunt_toestand.html#afd203e20267c83a9591ba795e5707802',1,'KruispuntToestand']]],
+  ['blokzoeker_5',['blokZoeker',['../class_zumo_robot.html#a9b251394043d80554ec72a2642bbbde8',1,'ZumoRobot']]],
+  ['blosgelaten_6',['bLosgelaten',['../class_start_toestand.html#a764ded58e043f19a3f864ed43f43244f',1,'StartToestand']]],
+  ['bocht_5faankondig_5fcm_7',['BOCHT_AANKONDIG_CM',['../class_robot_config.html#ac20784f9bc25602e76670e2a4e02085f',1,'RobotConfig']]],
+  ['bocht_5fmax_5fgraden_8',['BOCHT_MAX_GRADEN',['../class_robot_config.html#afc9295e9541852ca4dded310154cc02f',1,'RobotConfig']]],
+  ['bocht_5fmin_5fgraden_9',['BOCHT_MIN_GRADEN',['../class_robot_config.html#a87ca22355a85810c1d49f25ebc2bcc2f',1,'RobotConfig']]],
+  ['bocht_5frand_5fdirect_10',['BOCHT_RAND_DIRECT',['../class_robot_config.html#afa4ed6a9160757b7692ed5554add692f',1,'RobotConfig']]],
+  ['bocht_5frand_5fzwart_11',['BOCHT_RAND_ZWART',['../class_robot_config.html#a54a7465438439c99f2fb590e55fb048f',1,'RobotConfig']]],
+  ['bocht_5fstart_5ffout_12',['BOCHT_START_FOUT',['../class_robot_config.html#a2d28a89e67bbda0cc2163d4da4937968',1,'RobotConfig']]],
+  ['bochtkant_13',['bochtKant',['../class_lijn_volgen_toestand.html#a99df3b0f4fbb12f73930670bd5279909',1,'LijnVolgenToestand']]],
+  ['bochtticksl_14',['bochtTicksL',['../class_lijn_volgen_toestand.html#afe88086628a64403489818989b83c8be',1,'LijnVolgenToestand']]],
+  ['bochtticksr_15',['bochtTicksR',['../class_lijn_volgen_toestand.html#ac7fc07c5465b1651d7ab54f6a34e2715',1,'LijnVolgenToestand']]],
+  ['buttona_16',['buttonA',['../struct_sensor_data.html#a286ab54dfcdb316b941d6ac98bf83d89',1,'SensorData']]],
+  ['buttonb_17',['buttonB',['../struct_sensor_data.html#a8974df8c5f62da36b711d27bb89c5fef',1,'SensorData']]],
+  ['buttonc_18',['buttonC',['../struct_sensor_data.html#ae39de1d81d3af5708f7598e1e04d5993',1,'SensorData']]],
+  ['buzzer_19',['buzzer',['../class_zumo_hardware.html#a716ff2d565d3f6b2daf901efc3088a66',1,'ZumoHardware']]]
+];

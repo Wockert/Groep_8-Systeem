@@ -1,0 +1,27 @@
+var class_zumo_robot =
+[
+    [ "getBaanPlan", "class_zumo_robot.html#a5a7a877e6221ac6ff5cbf4cd198e1180", null ],
+    [ "getHardware", "class_zumo_robot.html#ab5d019f4d3ae50cebdbe3febbe7662fb", null ],
+    [ "getLijnAnalyse", "class_zumo_robot.html#a22edf86d93c87fefd0376a071e81e371", null ],
+    [ "getRijController", "class_zumo_robot.html#a5579f4bcf44acedcb390f80273672c9e", null ],
+    [ "getSensorData", "class_zumo_robot.html#a7a874d997e2a38003a02cc27387cd670", null ],
+    [ "loop", "class_zumo_robot.html#ac6602925bcf6c4c7e0998a579aeff952", null ],
+    [ "printSensorData", "class_zumo_robot.html#a8701f932cd5214210c60495c650b8e49", null ],
+    [ "setState", "class_zumo_robot.html#ab2ded020acd105abd3374414364aa995", null ],
+    [ "setup", "class_zumo_robot.html#a4a50022371107786a4959361ba157115", null ],
+    [ "update", "class_zumo_robot.html#af5a6096517fee5a0c7a8d882a126c180", null ],
+    [ "baanPlan", "class_zumo_robot.html#a421a8b1c8397638df74d6e33df1aebd0", null ],
+    [ "blokZoeker", "class_zumo_robot.html#a9b251394043d80554ec72a2642bbbde8", null ],
+    [ "grijsLinksGezien", "class_zumo_robot.html#a5c9e03347bb4d899fa28d560d35acd46", null ],
+    [ "grijsRechtsGezien", "class_zumo_robot.html#a957667df6f3bb9e7de8637b98c4c0842", null ],
+    [ "hardware", "class_zumo_robot.html#a87afb3c6a71ad9b8738808d4ddcb0fa3", null ],
+    [ "huidigeSnelheid", "class_zumo_robot.html#a0ffd29d141b20f3e25ea7c9ae0d093e2", null ],
+    [ "huidigeStaat", "class_zumo_robot.html#ab4563bc5e45585d4cdac418fb28d17bd", null ],
+    [ "laatsteFout", "class_zumo_robot.html#acabc54951fbef9f2d48f7d44cf7c0993", null ],
+    [ "laatsteLijnGezien", "class_zumo_robot.html#a1995afc625654713f7b1f50b1d298403", null ],
+    [ "lijnAnalyse", "class_zumo_robot.html#a7b9b1700ca4ef9ac74960c196352a964", null ],
+    [ "pitchDetector", "class_zumo_robot.html#ad7b6f9c490380322d5a508ba49f7a9fa", null ],
+    [ "rijController", "class_zumo_robot.html#a139d5db56a1160b12ae512bad53bae25", null ],
+    [ "sensorData", "class_zumo_robot.html#ab0a15150ab05e4430781155138691bc0", null ],
+    [ "vorigeFout", "class_zumo_robot.html#a9e5ea2163f7918005c5daa6cac241c3c", null ]
+];

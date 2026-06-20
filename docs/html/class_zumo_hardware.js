@@ -1,0 +1,26 @@
+var class_zumo_hardware =
+[
+    [ "getTicksLinks", "class_zumo_hardware.html#a34a4cc417f07c936cb4afa4b6ca5049d", null ],
+    [ "getTicksRechts", "class_zumo_hardware.html#a43b4224f11377353f80750bd7d0faf31", null ],
+    [ "init", "class_zumo_hardware.html#a408ecf211d4bbeeb7cca83b5eb5f968e", null ],
+    [ "kalibreerGroenVegend", "class_zumo_hardware.html#aaad6a1911591e0f1667de70caac991df", null ],
+    [ "kalibreerLijn", "class_zumo_hardware.html#af63deea010b825134b46b3c986240748", null ],
+    [ "leesSnapshot", "class_zumo_hardware.html#adb1e1fdd7a7c81d3cae490e781f493b5", null ],
+    [ "playDoneSound", "class_zumo_hardware.html#a3a27cef66caf669de1c9adbde02b00d4", null ],
+    [ "print", "class_zumo_hardware.html#a287ae01d4705c631ff8d52d823e8e11c", null ],
+    [ "readCalibrated", "class_zumo_hardware.html#acb73efe8123bb607d085b7fa032bd0ec", null ],
+    [ "readLine", "class_zumo_hardware.html#acb7d7a6792b98e57bcd294fec093e892", null ],
+    [ "setMotorSpeeds", "class_zumo_hardware.html#ac899927c603f6d444babc430391c5521", null ],
+    [ "speelGroenGeluid", "class_zumo_hardware.html#ac5e14f103ee121b84b4a39b431faa9a3", null ],
+    [ "stopMotors", "class_zumo_hardware.html#a98f5c26097b6a81dfc88376e56d97f24", null ],
+    [ "buzzer", "class_zumo_hardware.html#a716ff2d565d3f6b2daf901efc3088a66", null ],
+    [ "encoders", "class_zumo_hardware.html#a83fee16e0a992550da877ed6385f3d2b", null ],
+    [ "imu", "class_zumo_hardware.html#ab9e675c2c81db218bd6262c043b905f7", null ],
+    [ "knopA", "class_zumo_hardware.html#a3618b199d78a35a9d77977e8c7766eaa", null ],
+    [ "knopB", "class_zumo_hardware.html#a285aac8b803aec1eab0563ecd8f59c52", null ],
+    [ "knopC", "class_zumo_hardware.html#a07336d117e0ec82ee3def19b1d15aaed", null ],
+    [ "lcd", "class_zumo_hardware.html#ac900cb0f23849563fab833b2c76fe6a0", null ],
+    [ "motors", "class_zumo_hardware.html#afe2fc67106503c54a526ff2a48588d62", null ],
+    [ "prox", "class_zumo_hardware.html#a265f10b85749434a77ad0f322585fdde", null ],
+    [ "sensors", "class_zumo_hardware.html#a849536107d91819c3f461b4299408ce7", null ]
+];
