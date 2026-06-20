@@ -1,15 +1,12 @@
-// =============================================================
-//  zumo.ino  -  Arduino entry point (alleen wiring, geen logica)
-//  Maakt de hoofdklasse ZumoRobot aan en delegeert setup/loop.
-// =============================================================
+// Arduino entry point: enkel wiring, alle logica zit in ZumoRobot.
 #include "src/core/ZumoRobot.h"
 
 ZumoRobot robot;
 
 void setup() {
-  robot.setup();   // draait 1x bij opstarten
+  robot.setup();   // eenmalige initialisatie
 }
 
 void loop() {
-  robot.loop();    // draait continu
+  robot.loop();    // herhaalde hoofdlus
 }
