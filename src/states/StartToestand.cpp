@@ -4,7 +4,7 @@
 
 StartToestand::StartToestand(ZumoRobot& robot) : RobotToestand(robot) {}
 
-static int kalStap = 0;
+static int kalStap = 0;   // 0=nog niets, 1=zwart gekalibreerd, 2=groen gekalibreerd (klaar)
 
 void StartToestand::enter() {
   robot.getHardware().stopMotors();
@@ -15,6 +15,7 @@ void StartToestand::enter() {
 void StartToestand::update() {
   const SensorData& s = robot.getSensorData();
 
+  // Knop B: grijs ijken (mag pas nadat zwart is gekalibreerd).
   if (!s.buttonB) {
     bLosgelaten = true;
   } else if (bLosgelaten) {
@@ -42,6 +43,7 @@ void StartToestand::update() {
     return;
   }
 
+  // Knop A: eerst zwart kalibreren (stap 0), daarna groen ijken (stap 1).
   if (!s.buttonA) {
     aLosgelaten = true;
   } else if (aLosgelaten) {
@@ -68,6 +70,7 @@ void StartToestand::update() {
     return;
   }
 
+  // Knop C: start de rit (alleen als zwart én groen gekalibreerd zijn).
   if (!s.buttonC) {
     cLosgelaten = true;
   } else if (cLosgelaten) {

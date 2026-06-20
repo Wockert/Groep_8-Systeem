@@ -1,5 +1,6 @@
 #include "PitchDetector.h"
 
+// Nog niet geïmplementeerd: placeholders voor de pitch-detectie.
 float PitchDetector::getPitch() {
   return 0.0f;
 }

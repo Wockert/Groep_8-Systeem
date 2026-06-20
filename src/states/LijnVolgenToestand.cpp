@@ -33,6 +33,7 @@ void LijnVolgenToestand::update() {
   int positie = s.linePosition;
   for (int i = 0; i < 5; i++) sensorWaarden[i] = (unsigned int)s.lineValues[i];
 
+  // Donkerste sensor opzoeken (max waarde + index).
   unsigned int maxWaarde = 0;
   int          maxIndex  = 0;
   for (int i = 0; i < 5; i++)
@@ -40,11 +41,13 @@ void LijnVolgenToestand::update() {
 
   const unsigned int DREMPEL_LIJN = 150;
 
+  // Onthoud zwart aan een buitensensor: hint voor een aankomende scherpe bocht.
   if (maxWaarde >= DREMPEL_LIJN && (maxIndex == 0 || maxIndex == 4)) {
     zwartZijKant = (maxIndex == 0) ? -1 : +1;
     zwartZijCm   = s.distanceCm;
   }
 
+  // Grijze markering bij een verwacht kruispunt -> overgaan naar KruispuntToestand.
   bool kruispuntVerwacht = robot.getBaanPlan().isVerwacht(CP_KRUISPUNT, s.distanceCm);
   LineSensorAnalyse& lijn = robot.getLijnAnalyse();
   bool grijsL = RobotConfig::GRIJS_ACTIEF && kruispuntVerwacht && lijn.grijsTapeLinks();
@@ -60,7 +63,9 @@ void LijnVolgenToestand::update() {
     grijsTeller = 0;
   }
 
+  // Bezig met een pivot-bocht: draai door tot de lijn weer in het midden zit (of de max-hoek is bereikt).
   if (inBocht) {
+    // Gedraaide hoek schatten uit het verschil in encoderstanden sinds de bocht begon.
     long dL = robot.getHardware().getTicksLinks()  - bochtTicksL;
     long dR = robot.getHardware().getTicksRechts() - bochtTicksR;
     float boogCm = ((abs(dL) + abs(dR)) / 2.0f) * RobotConfig::CM_PER_PULSE;
@@ -102,6 +107,7 @@ void LijnVolgenToestand::update() {
   bool naBocht = (naBochtCm >= 0.0f) &&
                  (s.distanceCm - naBochtCm < RobotConfig::NABOCHT_CM);
 
+  // Bocht aankondigen: één buitenrand wordt zwart (na een paar bevestigingen of bij heel sterk zwart).
   bool randLinksZwart  = sensorWaarden[0] > (unsigned int)RobotConfig::BOCHT_RAND_ZWART;
   bool randRechtsZwart = sensorWaarden[4] > (unsigned int)RobotConfig::BOCHT_RAND_ZWART;
   if (!naBocht && (randLinksZwart != randRechtsZwart)) {
@@ -118,6 +124,7 @@ void LijnVolgenToestand::update() {
   bool bochtAanstaande = (randZwartCm >= 0.0f) &&
                          (s.distanceCm - randZwartCm < RobotConfig::BOCHT_AANKONDIG_CM);
 
+  // Groene lijn bij een verwacht groen-checkpoint -> overgaan naar GroeneLijnToestand.
   if (RobotConfig::GROEN_ACTIEF && !bochtAanstaande && !naBocht
       && robot.getBaanPlan().isVerwacht(CP_GROEN, s.distanceCm)
       && maxWaarde >= DREMPEL_LIJN && robot.getLijnAnalyse().isGroeneLijn()) {
@@ -132,6 +139,7 @@ void LijnVolgenToestand::update() {
     groenTeller = 0;
   }
 
+  // Lijn kwijt: of een bocht inzetten (recent zwart aan de zijkant / aangekondigd), of het gat overbruggen.
   if (maxWaarde < DREMPEL_LIJN) {
     bool zijNetGezien = (zwartZijKant != 0) && (zwartZijCm >= 0.0f) &&
                         (s.distanceCm - zwartZijCm < RobotConfig::LIJN_KWIJT_GEHEUGEN_CM);
@@ -154,6 +162,7 @@ void LijnVolgenToestand::update() {
     }
     stippelGatCm = s.distanceCm;
 
+    // Te lang geen lijn gezien: alsnog gaan zoeken met een pivot, richting op basis van de laatste fout.
     if (s.distanceCm - stippelZoneStartCm > RobotConfig::STIPPEL_ZONE_MAX_CM) {
       inStippelZone = false;
       inBocht       = true;
@@ -182,6 +191,7 @@ void LijnVolgenToestand::update() {
     }
   }
 
+  // Helling-checkpoint (omhoog/wip): bevestig via de pitch en rond het checkpoint af.
   Checkpoint vw = robot.getBaanPlan().verwacht();
   if ((vw == CP_OMHOOG || vw == CP_WIP) && fabs(s.pitch) > RobotConfig::PITCH_GRADEN) {
     if (++pitchTeller >= RobotConfig::PITCH_BEVESTIG) {
@@ -205,6 +215,7 @@ void LijnVolgenToestand::update() {
     return;
   }
 
+  // PID-regeling: P op de fout, I op de (afnemende) foutsom, D op de gefilterde afgeleide.
   int afgeleide = fout - vorigeFout;
   dGefilterd    = (dGefilterd + afgeleide) / 2;
 
@@ -216,6 +227,7 @@ void LijnVolgenToestand::update() {
                 + (RobotConfig::KI * foutSom)
                 + (RobotConfig::KD * dGefilterd);
 
+  // Bij grotere fout sterker bijsturen.
   correctie = (int)(correctie * (1.0f + abs(fout) / 1500.0f));
 
   if (naBocht) {
@@ -223,6 +235,7 @@ void LijnVolgenToestand::update() {
                                       RobotConfig::NABOCHT_CORRECTIE_MAX);
   }
 
+  // Doelsnelheid: hard op recht stuk, langzamer bij grote fout / rond bochten; geleidelijk laten meebewegen.
   int doel = map(abs(fout), 0, 2000,
                  RobotConfig::SNELHEID_RECHT, RobotConfig::SNELHEID_LAAG);
   if (bochtAanstaande || naBocht) doel = RobotConfig::SNELHEID_LAAG;

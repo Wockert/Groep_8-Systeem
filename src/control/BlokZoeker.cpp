@@ -1,5 +1,6 @@
 #include "BlokZoeker.h"
 
+// Nog niet geïmplementeerd: placeholders voor de blok-duw-functionaliteit.
 void BlokZoeker::zoekEnDuwBlok() {
 }
 

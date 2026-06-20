@@ -28,6 +28,7 @@ void GroeneLijnToestand::update() {
     return;
   }
 
+  // Geen groen meer (na een paar bevestigingen): checkpoint afronden en terug naar de zwarte lijnvolger.
   if (!robot.getLijnAnalyse().isGroeneLijn()) {
     if (++zwartTeller >= RobotConfig::GROEN_BEVESTIG) {
       Serial.println(F("[GROEN] exit: geen groen meer -> zwarte lijnvolger"));
@@ -39,6 +40,7 @@ void GroeneLijnToestand::update() {
     zwartTeller = 0;
   }
 
+  // PID-regeling, identiek aan de zwarte lijnvolger maar met groen-snelheden.
   int fout      = s.linePosition - 2000;
   int afgeleide = fout - vorigeFout;
   dGefilterd    = (dGefilterd + afgeleide) / 2;

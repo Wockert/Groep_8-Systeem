@@ -28,6 +28,7 @@ void KruispuntToestand::update() {
 
   LineSensorAnalyse& lijn = robot.getLijnAnalyse();
 
+  // Afslaan: stuur met een vaste bias naar de gekozen kant tot de afslagtijd om is.
   if (bezigMetAfslaan) {
     int positie   = robot.getSensorData().linePosition;
     int fout      = (positie - 2000) + afslagRichting * RobotConfig::SPLITS_BIAS;
@@ -44,6 +45,7 @@ void KruispuntToestand::update() {
     return;
   }
 
+  // Lijn weg op de splitsing: afslaan als een kant onthouden is, anders gewoon verder lijnvolgen.
   unsigned int maxW = 0;
   for (int i = 0; i < 5; i++)
     if ((unsigned int)s.lineValues[i] > maxW) maxW = (unsigned int)s.lineValues[i];
@@ -73,6 +75,7 @@ void KruispuntToestand::update() {
     splitsTeller = 0;
   }
 
+  // Geen afslag binnen de geldige afstand: terug naar de normale lijnvolger.
   if (s.distanceCm - grijsCm > RobotConfig::GRIJS_GELDIG_CM) {
     robot.setState(new LijnVolgenToestand(robot));
     return;
@@ -92,9 +95,11 @@ void KruispuntToestand::volgLijn() {
                                      RobotConfig::SNELHEID_GRIJS - correctie);
 }
 
+// Detecteer grijze markeringen links/rechts en onthoud de eerste die bevestigd wordt.
 void KruispuntToestand::behandelMarkeringen() {
   LineSensorAnalyse& lijn = robot.getLijnAnalyse();
 
+  // Kort na een eerdere markering niets nieuws onthouden (lock-afstand).
   if ((grijsLinks || grijsRechts) &&
       robot.getSensorData().distanceCm - grijsCm < RobotConfig::GRIJS_LOCK_CM) {
     return;

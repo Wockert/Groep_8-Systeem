@@ -18,6 +18,7 @@ void ZumoRobot::loop() {
   update();
 }
 
+// Verlaat de oude toestand (en ruim 'm op) en activeer de nieuwe.
 void ZumoRobot::setState(RobotToestand* staat) {
   if (huidigeStaat != nullptr) {
     huidigeStaat->exit();
@@ -30,6 +31,7 @@ void ZumoRobot::setState(RobotToestand* staat) {
   printSensorData();
 }
 
+// Eén iteratie: verse sensormeting, periodieke debug-print en de actieve toestand updaten.
 void ZumoRobot::update() {
   sensorData = hardware.leesSnapshot();
   lijnAnalyse.updateWaarden(sensorData.lineValues);
@@ -49,6 +51,7 @@ const SensorData& ZumoRobot::getSensorData() const {
   return sensorData;
 }
 
+// Debug-uitvoer van de sensorwaarden over serieel (alleen als DEBUG_SENSOR_PRINT aanstaat).
 void ZumoRobot::printSensorData() {
   if (!RobotConfig::DEBUG_SENSOR_PRINT) return;
 

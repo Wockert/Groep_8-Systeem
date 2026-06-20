@@ -1,9 +1,11 @@
 #pragma once
 
+// Centrale instellingen: alle afstelbare constanten voor de robot op één plek.
 class RobotConfig {
 public:
   static constexpr bool DEBUG_SENSOR_PRINT = false;
 
+  // Snelheden (motorvermogen)
   static constexpr int SNELHEID_MAX      = 250;
   static constexpr int SNELHEID_NORMAAL  = 200;
   static constexpr int SNELHEID_GRIJS    = 120;
@@ -18,6 +20,7 @@ public:
 
   static constexpr bool GRIJS_ACTIEF     = true;
 
+  // Kleur- en lijndrempels (sensorwaarden)
   static constexpr int DREMPEL_ZWART     = 700;
   static constexpr int DREMPEL_GRIJS_L   = 200;
   static constexpr int DREMPEL_GRIJS_H   = 650;
@@ -45,12 +48,14 @@ public:
 
   static constexpr float CM_PER_PULSE    = 0.019f;
 
+  // PID-regeling voor het volgen van de lijn
   static constexpr float KP = 0.70f;
   static constexpr float KD = 2.0f;
   static constexpr float KI           = 0.012f;
   static constexpr long  FOUT_SOM_MAX = 15000;
   static constexpr int   LIJN_DODEZONE = 200;
 
+  // Bochten en afstanden (cm / graden)
   static constexpr int BOCHT_RAND_ZWART = 500;
 
   static constexpr float BOCHT_AANKONDIG_CM = 10.0f;
@@ -71,6 +76,7 @@ public:
 
   static constexpr float CP_MIN_AFSTAND_CM = 15.0f;
 
+  // Wip-detectie via kanteling (pitch)
   static constexpr float PITCH_GRADEN   = 13.0f;
   static constexpr int   PITCH_BEVESTIG = 20;
 };

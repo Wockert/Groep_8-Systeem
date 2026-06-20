@@ -10,6 +10,7 @@ void ZumoHardware::init() {
   imu.enableDefault();
 }
 
+// Draai heen en weer over de lijn en kalibreer; faalt als een sensor te weinig contrast ziet.
 bool ZumoHardware::kalibreerLijn() {
   for (uint16_t i = 0; i < 120; i++) {
     if (i > 30 && i <= 90) motors.setSpeeds(-200, 200);
@@ -33,6 +34,7 @@ bool ZumoHardware::kalibreerLijn() {
   return true;
 }
 
+// Draai over de groene lijn en geef de hoogste gemeten middensensorwaarde (de groen-piek) terug.
 int ZumoHardware::kalibreerGroenVegend() {
   int piek = 0;
   for (uint16_t i = 0; i < 120; i++) {
@@ -71,6 +73,7 @@ void ZumoHardware::print(String text) {
   lcd.print(text);
 }
 
+// Nog niet geïmplementeerd.
 void ZumoHardware::playDoneSound() {
 }
 
@@ -81,6 +84,7 @@ void ZumoHardware::speelGroenGeluid() {
 long ZumoHardware::getTicksLinks()  { return encoders.getCountsLeft();  }
 long ZumoHardware::getTicksRechts() { return encoders.getCountsRight(); }
 
+// Lees alle sensoren uit en bundel ze in één SensorData-momentopname.
 SensorData ZumoHardware::leesSnapshot() {
   SensorData data;
 
@@ -90,6 +94,7 @@ SensorData ZumoHardware::leesSnapshot() {
     data.lineValues[i] = (int)cal[i];
   }
 
+  // Pitch/roll uit de versnellingsmeter berekenen.
   imu.readAcc();
   float ax = (float)imu.a.x;
   float ay = (float)imu.a.y;
@@ -100,6 +105,7 @@ SensorData ZumoHardware::leesSnapshot() {
   data.proxLeft  = 0;
   data.proxRight = 0;
 
+  // Gemiddelde encoderstand omrekenen naar afgelegde afstand in cm.
   long pulsen = ((long)encoders.getCountsLeft() + (long)encoders.getCountsRight()) / 2;
   data.distanceCm = pulsen * RobotConfig::CM_PER_PULSE;
 

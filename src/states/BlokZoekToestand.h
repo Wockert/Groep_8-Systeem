@@ -2,6 +2,7 @@
 
 #include "../core/RobotToestand.h"
 
+// Toestand voor het zoeken en duwen van een blok (nog te implementeren).
 class BlokZoekToestand : public RobotToestand {
 public:
   BlokZoekToestand(ZumoRobot& robot);

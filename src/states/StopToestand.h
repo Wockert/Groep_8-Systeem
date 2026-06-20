@@ -2,6 +2,7 @@
 
 #include "../core/RobotToestand.h"
 
+// Eindtoestand: robot staat stil (nog te implementeren).
 class StopToestand : public RobotToestand {
 public:
   StopToestand(ZumoRobot& robot);

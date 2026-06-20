@@ -7,6 +7,7 @@ struct PlanStap {
   float totCm;
 };
 
+// Vaste volgorde van checkpoints op de baan (vanafCm/totCm = 0 betekent: geen afstandsgrens).
 static const PlanStap PLAN[] = {
   { CP_STIPPELLIJN, 0, 0 },
   { CP_STIPPELLIJN, 0, 0 },
@@ -52,9 +53,11 @@ Checkpoint BaanPlan::verwacht() const {
   return (index < AANTAL) ? PLAN[index].type : CP_KLAAR;
 }
 
+// Klopt het aangeboden type met de verwachting, en zijn we ver genoeg van het vorige checkpoint?
 bool BaanPlan::isVerwacht(Checkpoint type, float huidigeCm) const {
   if (index >= AANTAL)          return false;
   if (PLAN[index].type != type) return false;
+  // Minimale afstand sinds vorig checkpoint, om dubbel-detecteren te voorkomen.
   if (laatsteAfrondCm > -999.0f &&
       huidigeCm - laatsteAfrondCm < RobotConfig::CP_MIN_AFSTAND_CM) return false;
   if (PLAN[index].totCm > 0.0f) {

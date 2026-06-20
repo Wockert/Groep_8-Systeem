@@ -10,9 +10,10 @@
 
 class RobotToestand;
 
+// Hoofdklasse: bundelt alle hardware/sensoren en stuurt de state-machine aan.
 class ZumoRobot {
 private:
-  RobotToestand* huidigeStaat     = nullptr;
+  RobotToestand* huidigeStaat     = nullptr;   // actieve toestand
   unsigned long  laatsteLijnGezien = 0;
   int            laatsteFout       = 0;
   int            vorigeFout        = 0;
@@ -31,10 +32,10 @@ private:
   void printSensorData();
 
 public:
-  void setup();
-  void loop();
-  void setState(RobotToestand* staat);
-  void update();
+  void setup();                        // eenmalige initialisatie (Arduino setup)
+  void loop();                         // herhaalde lus (Arduino loop)
+  void setState(RobotToestand* staat); // wissel naar een nieuwe toestand
+  void update();                       // lees sensoren en draai de huidige toestand
 
   const SensorData& getSensorData() const;
 

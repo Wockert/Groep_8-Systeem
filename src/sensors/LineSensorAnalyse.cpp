@@ -15,6 +15,7 @@ void LineSensorAnalyse::ijkGrijs(int waarde) {
   grijsNiveau = waarde;
 }
 
+// Grijs = binnen een band rond het geijkte niveau (of vaste drempels als niet geijkt), maar niet zwart.
 bool LineSensorAnalyse::isGrijs(int waarde) {
   int laag = (grijsNiveau > 0) ? grijsNiveau - RobotConfig::GRIJS_MARGE : RobotConfig::DREMPEL_GRIJS_L;
   int hoog = (grijsNiveau > 0) ? grijsNiveau + RobotConfig::GRIJS_MARGE : RobotConfig::DREMPEL_GRIJS_H;
@@ -33,6 +34,7 @@ bool LineSensorAnalyse::lijnZichtbaar() {
   return aantalZwart() >= 1;
 }
 
+// Kruising: brede dwarsbalk (>=4 zwart) én het midden zwart, om scherpe bochten uit te sluiten.
 bool LineSensorAnalyse::isKruising() {
   return aantalZwart() >= 4 && sensorWaarden[2] > RobotConfig::DREMPEL_ZWART;
 }
@@ -47,6 +49,7 @@ void LineSensorAnalyse::ijkGroen(int waarde) {
   groenNiveau = waarde;
 }
 
+// Groen: alleen de middelste drie sensoren (0 en 4 zijn onbetrouwbaar); piek binnen de groen-band.
 bool LineSensorAnalyse::isGroeneLijn() {
   int maxWaarde = 0;
   for (int i = 1; i <= 3; i++)
@@ -61,6 +64,7 @@ bool LineSensorAnalyse::isBruineLijn() {
   return false;
 }
 
+// Grijze markering links: buitenste linkersensor in de grijs-band, duidelijk boven wit, buur niet zwart.
 bool LineSensorAnalyse::grijsTapeLinks() {
   return isGrijs(sensorWaarden[0])
       && sensorWaarden[0] - witNiveau() > RobotConfig::GRIJS_BOVEN_WIT
@@ -68,6 +72,7 @@ bool LineSensorAnalyse::grijsTapeLinks() {
       && sensorWaarden[0] >= sensorWaarden[4];
 }
 
+// Grijze markering rechts: spiegelbeeld van grijsTapeLinks() voor de rechterrand.
 bool LineSensorAnalyse::grijsTapeRechts() {
   return isGrijs(sensorWaarden[4])
       && sensorWaarden[4] - witNiveau() > RobotConfig::GRIJS_BOVEN_WIT
