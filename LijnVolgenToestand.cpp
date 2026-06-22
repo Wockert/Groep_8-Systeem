@@ -54,17 +54,7 @@ void LijnVolgenToestand::update() {
 
   LineSensorAnalyse& lijn = robot.getLijnAnalyse();
 
-  // =============================================================
-  //  WIP: STOPPEN BIJ LINKS EN RECHTS GRIJS
-  // =============================================================
-  // BELANGRIJK:
-  // Hier gebruiken we GEEN pitch.
-  // De pitch komt pas in WipWachtToestand, nadat hij kort is doorgereden.
-  //
-  // Links grijs = sensor 0 OF 1.
-  // Rechts grijs = sensor 3 OF 4.
-  // Alleen als links EN rechts grijs gezien zijn, gaat hij naar WipWacht.
-  // =============================================================
+
 
   bool linksGrijs =
     (
@@ -132,9 +122,6 @@ void LijnVolgenToestand::update() {
     zwartZijCm   = s.distanceCm;
   }
 
-  // =============================================================
-  //  NORMALE GRIJS-DETECTIE VOOR KRUISPUNT
-  // =============================================================
 
   bool kruispuntVerwacht = robot.getBaanPlan().isVerwacht(CP_KRUISPUNT, s.distanceCm);
 
