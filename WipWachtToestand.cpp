@@ -37,7 +37,6 @@ void WipWachtToestand::update() {
   robot.getHardware().stopMotors();
 
   // Verder rijden als de pitch duidelijk lager is dan de hoogste pitch.
-  // Dus: eerst /, daarna richting \.
   bool pitchLager = pitch < (hoogstePitch - 2.0f);
 
   if (pitchLager) {
